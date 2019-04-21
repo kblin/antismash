@@ -812,9 +812,9 @@ def check_clusterblast_files(definition_file: str,
 
     if path.locate_file(fasta_file) is None:
         failure_messages.append("Failed to locate cluster proteins: {!r}".format(fasta_file))
-    elif path.locate_file(db_file) is None or not check_diamond_db_compatible(db_file):
+    elif path.locate_file(db_file) is None or not check_diamond_db_compatible(db_file) or path.is_outdated(db_file, fasta_file):
         try:
-            logging.debug("diamond database %r missing or incompatible version, regenerating.", db_file)
+            logging.debug("diamond database %r missing, outdated, or incompatible version, regenerating.", db_file)
             subprocessing.run_diamond_makedb(db_file, fasta_file)
         except RuntimeError:
             if not logging_only:
