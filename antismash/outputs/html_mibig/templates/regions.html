@@ -1,0 +1,84 @@
+{% import 'legend_entry_macro.html' as le %}
+
+{% set record = records[0] %}
+{% set results = results_by_record_id[record.id] %}
+{% set region = record.regions[0] %}
+{% set data = results["antismash.detection.mibig"].data %}
+<div class="page" id='{{region.anchor_id}}'>
+ <div class="region-grid">
+  <div class="content">
+    <div class="description-container">
+      <div class="heading">
+        {{data["cluster"]["mibig_accession"]}}: {{data["cluster"]["compounds"][0]["compound"]}} biosynthetic gene cluster from {{data["cluster"]["loci"]["organism"]}}
+        {{help_tooltip(svg_tooltip, "region_svg")}}
+      </div>
+      <div class="contig-edge-warning">
+        <a href="./generated/index.html#r1c1" style="background: none;">View antiSMASH-generated output</a>
+      </div>
+      <div class="region-download">
+        <a style="background: none;" href="{{ '%s.region%03d.gbk' % (record.id, region.get_region_number()) }}"">Download Cluster GenBank file</a>
+      </div>
+      <div class = 'description-text'>
+        {{region.description_text()}}.
+        {% if not data["cluster"]["loci"]["accession"].startswith("MIBIG") %}
+        <br />
+        This entry is originated from Genbank <a href="http://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}">{{data["cluster"]["loci"]["accession"]}}</a>.
+        {% endif %}
+      </div>
+      <div class="region-svg-container">
+       <div id='{{region.anchor_id}}-svg'>
+       </div>
+      </div>
+    </div>
+    <div class="legend">
+      <h4>Legend:</h4>
+      <div class="legend-items">
+        {{le.legend('legend-type-biosynthetic', 'core biosynthetic genes')}}
+        {{le.legend('legend-type-biosynthetic-additional', 'additional biosynthetic genes')}}
+        {{le.legend('legend-type-transport', 'transport-related genes')}}
+        {{le.legend('legend-type-regulatory', 'regulatory genes')}}
+        {{le.legend('legend-type-resistance', 'resistance genes')}}
+        {{le.legend('legend-type-other', 'other genes')}}
+      </div>
+    </div>
+    <div class="zoom-buttons">
+      <div class="button-like zoom-button zoom-reset"><img src="images/expand-arrows-alt-solid.svg" alt="reset zoom">reset view</div>
+      <div class="button-like zoom-button zoom-in"><img src="images/search-solid.svg" alt="zoom">zoom to selection</div>
+    </div>
+  </div>
+
+  <div class="focus-panel">
+    <div class="heading">
+      <span>Gene details</span>
+      {{help_tooltip("Shows details of the most recently selected gene, including names, products, location, and other annotations.", "focus-panel")}}
+    </div>
+    <div class="focus-panel-content focus-panel-content-{{region.anchor_id}}">
+        <div style="text-align: center; margin-top: 30%;">
+            Select a gene to view the details available for it
+        </div>
+    </div>
+  </div>
+
+  {% set all_module_sections = sections[record.id][region.get_region_number()] %}
+  <div class="body-details">
+    <div class="body-details-headers">
+    {% for module_sections in all_module_sections %}
+     {% for section in module_sections.detail_sections %}
+      <div class="body-details-header {{region.anchor_id}}-{{section.class_name}}" data-name="{{region.anchor_id}}-{{section.class_name}}">
+        {{section.label}}
+      </div>
+     {% endfor %}
+    {% endfor %}
+    </div>
+    {% for module_sections in all_module_sections %}
+     {% for section in module_sections.detail_sections %}
+    <div class="body-details-section {{region.anchor_id}}-{{section.class_name}}">
+      {{section.content}}
+    </div>
+     {% endfor %}
+    {% endfor %}
+  </div>
+
+ </div>
+
+</div>

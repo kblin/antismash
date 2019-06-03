@@ -55,6 +55,8 @@ from antismash.modules import (active_site_finder,
                                )
 from antismash.outputs import html, svg
 from antismash.custom_typing import AntismashModule
+from antismash.detection import mibig
+from antismash.outputs import html_mibig
 
 __version__ = "5.2.0"
 
@@ -82,6 +84,7 @@ def get_detection_modules() -> List[AntismashModule]:
     """
     return [genefinding, hmm_detection, nrps_pks_domains, full_hmmer, cassis,  # type: ignore
             clusterfinder_probabilistic, cluster_hmmer,
+            mibig,
             genefunctions]
 
 
@@ -198,6 +201,57 @@ def run_detection(record: Record, options: ConfigType,
     return timings
 
 
+def run_mibig_detection(record: Record, options: ConfigType,
+                        module_results: Dict[str, Union[ModuleResults, Dict[str, Any]]]) -> Dict[str, float]:
+    """ Detect different secondary metabolite clusters, PFAMs, and domains.
+
+        Arguments:
+            record: the Record to run detection over
+            options: antiSMASH config
+            module_results: a dictionary mapping a module's name to results from
+                            a previous run on this module, as a ModuleResults subclass
+                            or in JSON form
+
+        Returns:
+            the time taken by each detection module as a dictionary
+    """
+    timings = {}  # type: Dict[str, float]
+
+    logging.info("Loading MiBIG annotations")
+    run_module(record, cast(AntismashModule, mibig), options, module_results, timings)
+    results = module_results.get(mibig.__name__)
+    if not results:
+        raise ValueError("failed to load MiBIG annotations")
+    for protocluster in results.get_predicted_protoclusters():
+        record.add_protocluster(protocluster)
+    for region in results.get_predicted_subregions():
+        record.add_subregion(region)
+
+    # annotate biosynthetic domains
+    run_module(record, cast(AntismashModule, hmm_detection), options, module_results, timings)
+
+    record.create_candidate_clusters()
+    record.create_regions()
+
+    if not record.get_regions():
+        logging.info("No regions detected, skipping record")
+        record.skip = "No regions detected"
+        return timings
+
+    logging.info("%d region(s) detected in record", len(record.get_regions()))
+
+    # finally, run any detection limited to genes in regions
+    for module in [cluster_hmmer, genefunctions]:#nrps_pks_domains, cluster_hmmer, genefunctions]:
+        run_module(record, cast(AntismashModule, module), options, module_results, timings)
+        results = module_results.get(module.__name__)
+        if results:
+            assert isinstance(results, ModuleResults)
+            logging.debug("Adding detection results from %s to record", module.__name__)
+            results.add_to_record(record)
+
+    return timings
+
+
 def run_module(record: Record, module: AntismashModule, options: ConfigType,
                module_results: Dict[str, Union[ModuleResults, Dict[str, Any]]],
                timings: Dict[str, float]
@@ -261,6 +315,8 @@ def analyse_record(record: Record, options: ConfigType, modules: List[AntismashM
     """
     timings = {}  # type: Dict[str, float]
     # try to run the given modules over the record
+    if options.mibig_mode: # override for mibig_mode specific modules
+        modules = [clusterblast]
     for module in modules:
         run_module(record, module, options, previous_result, timings)
     return timings
@@ -412,7 +468,10 @@ def write_outputs(results: serialiser.AntismashResults, options: ConfigType) -> 
         module_results_per_record.append(record_result)
 
     logging.debug("Creating results page")
-    html.write(results.records, module_results_per_record, options)
+    if options.mibig_mode:
+        html_mibig.write(results.records, module_results_per_record, options)
+    else:
+        html.write(results.records, module_results_per_record, options)
 
     logging.debug("Creating results SVGs")
     svg.write(options, module_results_per_record)
@@ -669,7 +728,10 @@ def _run_antismash(sequence_file: Optional[str], options: ConfigType) -> int:
         if record.skip:
             continue
         logging.info("Analysing record: %s", record.id)
-        timings = run_detection(record, options, module_results)
+        if options.mibig_mode:
+            timings = run_mibig_detection(record, options, module_results)
+        else:
+            timings = run_detection(record, options, module_results)
         # and skip analysis if detection didn't find anything
         if not record.get_regions():
             continue
