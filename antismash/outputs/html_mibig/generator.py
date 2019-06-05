@@ -133,7 +133,7 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
                 record_layers_without_regions.append(RecordLayer(record, None, options_layer))
             results_by_record_id[record.id] = record_results
 
-        page_title = "MIBiG Repository"
+        page_title = "the MIBiG Repository"
 
         regions_written = sum(len(record.get_regions()) for record in records)
         job_id = os.path.basename(options.output_dir)

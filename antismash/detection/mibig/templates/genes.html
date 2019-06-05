@@ -1,0 +1,47 @@
+<div class="details">
+    <div class="heading">
+        <span>List of genes involved in compound(s) production</span>
+    </div>
+    <div>
+        <table border="1" style="width: 100%">
+            <tr>
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">Locus tag</th>
+                        <th style="text-align: center;">Protein ID</th>
+                        <th style="text-align: center;">Name</th>
+                        <th style="text-align: center;" colspan="3">Position</th>
+                        <th style="text-align: center;">Product</th>
+                        <th style="text-align: center;">Functions</th>
+                        <th style="text-align: center;">Extra</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gene in genes %}
+                        <tr>
+                            <td>{{gene.get("locus_tag", "None")}}</td>
+                            <td>{{gene.get("protein_id", "None")}}</td>
+                            <td>{{gene.get("gene", "None")}}</td>
+                            {% if "start" in gene %}
+                                <td style="text-align: right;">{{gene["start"]}}</td>
+                                <td style="text-align: right;">{{gene["end"]}}</td>
+                                <td style="text-align: center;">{{"+" if gene["strand"]==1 else "-" if gene["strand"]==-1 else "n/a"}}</td>
+                            {% else %}
+                                <td colspan="3">(external)</td>
+                            {% endif %}
+                            <td>{{gene["product"]}}</td>
+                            <td>
+                                <ul style="padding:0; margin:0; list-style: none;">
+                                    {% for function in gene["functions"] %}
+                                    <li>{{function|safe}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>{{gene["extra"]}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </tr>
+        </table>
+    </div>
+</div>    

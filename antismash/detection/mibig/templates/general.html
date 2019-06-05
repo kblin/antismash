@@ -3,6 +3,135 @@
     <span>General information about the BGC</span>
     </div>
     <div>
-        {{data}}
+        <table border="1" style="width: 100%">
+            <tbody>
+                <tr>
+                    <td width="25%">
+                        <strong>MIBiG accession</strong>
+                    </td>
+                    <td>
+                        {{data["cluster"]["mibig_accession"]}}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Short description</strong>
+                    </td>
+                    <td>
+                        {{data["cluster"]["compounds"][0]["compound"]}}
+                        biosynthetic gene cluster from
+                        <i>{{data["cluster"]["loci"]["organism"]}}</i>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Status</strong>
+                    </td>
+                    <td>
+                        Minimal annotation: {{"yes" if data["cluster"].get("minimal", False) else "no"}}
+                        <div class="help-container" style="float: none;">
+                            <div class="help-icon" data-id="mibig-help-general-minimal" style="float: none; background-color: #006CA2;"></div>
+                            <span class="help-tooltip" id="mibig-help-general-minimal">A minimal annotation only contain information on the BGC loci and one or more linked chemical product(s)</span>
+                        </div>
+                        <br />
+                        Completeness: {{data["cluster"]["loci"]["completeness"]}}
+                        <div class="help-container" style="float: none;">
+                            <div class="help-icon" data-id="mibig-help-general-completeness" style="float: none; background-color: #006CA2;"></div>
+                            <span class="help-tooltip" id="mibig-help-general-completeness">Whether the loci encodes everything needed for the pathway producing the compound(s)</span>
+                        </div>
+                    </td>
+                </tr>
+                {% if "comments" in data %}
+                <tr>
+                    <td width="25%">
+                        <strong>Remarks</strong>
+                    </td>
+                    <td><i>"{{data["comments"]}}"</i></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td width="25%">
+                        <strong>Biosynthetic class(es)</strong>
+                    </td>
+                    <td>
+                        <ul style="padding: 0; margin: 0; list-style-image: none;">
+                            {% for class in data["cluster"]["biosyn_class"] %}
+                                {{class}}
+                                {% if class.lower() in data["cluster"] %}
+                                    {% if "subclass" in data["cluster"][class.lower()] %}
+                                        ({{data["cluster"][class.lower()]["subclass"]}})
+                                    {% elif "subclasses" in data["cluster"][class.lower()]%}
+                                        ({{"/".join(data["cluster"][class.lower()]["subclasses"])}})
+                                    {% elif class=="Terpene" %}
+                                        ({{data["cluster"][class.lower()]["carbon_count_subclass"]}}{{"/{}".format(data["cluster"][class.lower()]["structural_subclass"])}})
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}        
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Submitter</strong>
+                    </td>
+                    <td>
+                        {{data["submitter"]["name"]}} [<a href="mailto:{{data['submitter']['email']}}">contact</a>]
+                        <br />
+                        {{data["submitter"]["institution"]}}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Loci</strong>
+                    </td>
+                    <td>
+                        {% if data["cluster"]["loci"]["accession"].startswith("MIBIG:") %}
+                            Direct MIBiG submission: <a href="#">{{data["cluster"]["mibig_accession"]}}.gbk</a>
+                        {% else %}
+                            {% if "start_coord" in data["cluster"]["loci"] %}
+                                {% set startend="?from={}&to={}".format(data["cluster"]["loci"]["start_coord"], data["cluster"]["loci"]["end_coord"]) %}
+                            {% else %}
+                                {% set startend="" %}
+                            {% endif %}              
+                            NCBI GenBank: <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data["cluster"]["loci"]["accession"]}}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Compounds</strong>
+                    </td>
+                    <td>
+                        <ul style="padding: 0; margin: 0; list-style: none;">
+                            {% for compound in data["cluster"]["compounds"] %}
+                            <li>{{compound["compound"]}}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Species</strong>
+                    </td>
+                    <td>
+                        <i>{{data["cluster"]["loci"]["organism"]}}</i>
+                        [<a href="javascript: alert('{{'>'.join(data['cluster']['loci']['taxonomy'])}} (this is a temporary modal dialog)');">taxonomy</a>]
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>References</strong>
+                    </td>
+                    <td>
+                        <ul style="padding: 0; margin: 0; list-style: none;">
+                            {% for pub in data["cluster"]["publications"] %}
+                            <li style="margin-bottom: 1em;">
+                                {{pub}} (todo: auto-generate citation)
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            </table>
     </div>
 </div>

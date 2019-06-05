@@ -9,7 +9,7 @@
   <div class="content">
     <div class="description-container">
       <div class="heading">
-        {{data["cluster"]["mibig_accession"]}}: {{data["cluster"]["compounds"][0]["compound"]}} biosynthetic gene cluster from {{data["cluster"]["loci"]["organism"]}}
+        {{data["cluster"]["mibig_accession"]}}: {{data["cluster"]["compounds"][0]["compound"]}} biosynthetic gene cluster from <i>{{data["cluster"]["loci"]["organism"]}}</i>
         {{help_tooltip(svg_tooltip, "region_svg")}}
       </div>
       <div class="contig-edge-warning">
@@ -22,7 +22,12 @@
         {{region.description_text()}}.
         {% if not data["cluster"]["loci"]["accession"].startswith("MIBIG") %}
         <br />
-        This entry is originated from Genbank <a href="http://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}">{{data["cluster"]["loci"]["accession"]}}</a>.
+        {% if "start_coord" in data["cluster"]["loci"] %}
+          {% set startend="?from={}&to={}".format(data["cluster"]["loci"]["start_coord"], data["cluster"]["loci"]["end_coord"]) %}
+        {% else %}
+          {% set startend="" %}
+        {% endif %}
+        This entry is originated from NCBI GenBank <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data["cluster"]["loci"]["accession"]}}</a>.
         {% endif %}
       </div>
       <div class="region-svg-container">

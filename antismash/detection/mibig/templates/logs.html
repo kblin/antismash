@@ -1,0 +1,19 @@
+<div class="details">
+    <div class="heading">
+    <span>Annotation changelog</span>
+    </div>
+    <div>
+        MIBiG version:
+        <br />
+        <ul>
+            {% for log in logs %}
+            <li>
+                <strong>{{log["version"]}}</strong>
+                <ul>
+                    <li>{{log["comment"]}}</li>
+                </ul>
+            </li>
+            {% endfor %}        
+        </ul>
+    </div>
+</div>

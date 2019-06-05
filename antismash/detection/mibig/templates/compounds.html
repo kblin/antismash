@@ -1,7 +1,6 @@
 <div class="details">
     <div class="heading">
-    <span>Chemical products information</span>
-    {{help_tooltip("Listed here is the chemical products produced by the BGC. Multiple entries may include final product(s), intermediates, and/or isomers.", "mibig-compounds")}}
+        <span>Chemical products information</span>
     </div>
     <div>
         {% for compound in compounds %}
@@ -18,16 +17,16 @@
                         <div width="100%" style="text-align: center;">(no structure information available)</div>
                     </td>
                     {% endif %}
-                    <td colspan="2" style="padding-left: 0.5em;">
+                    <td colspan="2">
                         <strong>{{compound["compound"]}}</strong>
                     </td>
                     </tr>
                     {% for key in compound.keys() if key not in ["compound", "chem_struct"] %}
                     <tr style="font-size: 10pt;">
-                        <td width="15%" style="padding-left: 0.5em;"><strong>{{key}}</strong></td>
-                        <td style="padding-left: 0.5em;">
+                        <td width="15%"><strong>{{key}}</strong></td>
+                        <td>
                         {% if compound[key] is iterable and compound[key] is not string%}
-                        <ul style="padding:0; padding-left: 1em;">
+                        <ul style="padding:0; margin:0; list-style: none;">
                             {% for valu in compound[key] %}
                             <li>
                                 {% if key == "chem_targets" %}
