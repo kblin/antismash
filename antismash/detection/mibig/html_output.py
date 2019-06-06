@@ -32,7 +32,7 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
 
     html = HTMLSections("mibig-genes")
     genes = []
-    annots = [annot for annot in data["cluster"]["genes"]["annotations"]]
+    annots = [annot for annot in data["cluster"].get("genes", {}).get("annotations", [])]
     for cds_feature in _record_layer.get_cds_features_within_location(region_layer.location):
         gene = {
             "locus_tag": cds_feature.locus_tag,
@@ -42,14 +42,20 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
             "end": cds_feature.location.end,
             "strand": cds_feature.location.strand,
             "product": cds_feature.product,
-            "extra": ""
+            "aa_seq": cds_feature.translation,
+            "nt_seq": cds_feature.extract(_record_layer.seq)
         }
         gene["functions"] = []
         for function in cds_feature.gene_functions:
-            gene["functions"].append(str(function))
+            function_text = str(function.function)
+            if function.tool == "rule-based-clusters":
+                function_text += " ({})".format(function.description)
+            elif function.tool == "smcogs":
+                function_text += " ({})".format(function.description.split(" (")[0])
+            gene["functions"].append(function_text)
         annot_idx = -1
         for i, annot in enumerate(annots):
-            if annot["id"] == cds_feature.locus_tag or annot["name"] == cds_feature.gene:
+            if annot["id"] == cds_feature.locus_tag or annot["id"] == cds_feature.protein_id or annot["name"] == cds_feature.gene:
                 annot_idx = i
                 break
         if (annot_idx >= 0):
@@ -57,9 +63,12 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
             for function in annot.get("functions", []):
                 function_text = function["category"]
                 if len(annot.get('tailoring', [])) > 0:
-                    function_text += "({})".format(", ".join(annot['tailoring']))
+                    function_text += " ({}) ".format(", ".join(annot['tailoring']))
                 for evidence in function['evidence']:
                     function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
+                gene["functions"].append(function_text)
+            if "mut_pheno" in gene and len(gene.get("mut_pheno", "")) > 0:
+                function_text = "Mutation phenotype: {}".format(gene["mut_pheno"])
                 gene["functions"].append(function_text)
             if "product" in annot:
                 gene["product"] = annot["product"]
@@ -69,14 +78,13 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
             "locus_tag": annot.get("id", "None"),
             "protein_id": "None",
             "gene": annot.get("name", "None"),
-            "product": annot.get("product", ""),
-            "extra": ""
+            "product": annot.get("product", "")
         }
         gene["functions"] = []
         for function in annot.get("functions", []):
             function_text = function["category"]
             if len(annot.get('tailoring', [])) > 0:
-                function_text += "({})".format(", ".join(annot['tailoring']))
+                function_text += " ({}) ".format(", ".join(annot['tailoring']))
             for evidence in function['evidence']:
                 function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
             gene["functions"].append(function_text)
@@ -86,28 +94,27 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
 
     if "polyketide" in data["cluster"]:
         html = HTMLSections("mibig-polyketide")
-        html.add_detail_section("Polyketide", FileTemplate(path.get_full_path(__file__, "polyketide", "details.html")).render(data=results.data))
+        html.add_detail_section("Polyketide", FileTemplate(path.get_full_path(__file__, "polyketide", "details.html")).render(pk=results.data["cluster"]["polyketide"]))
         all_htmls.append(html)
 
     if "nrp" in data["cluster"]:
         html = HTMLSections("mibig-nrp")
-        html = HTMLSections("mibig-nrp")
-        html.add_detail_section("NRP", FileTemplate(path.get_full_path(__file__, "nrp", "details.html")).render(data=results.data))
+        html.add_detail_section("NRP", FileTemplate(path.get_full_path(__file__, "nrp", "details.html")).render(nrp=results.data["cluster"]["nrp"]))
         all_htmls.append(html)
 
     if "ripp" in data["cluster"]:
         html = HTMLSections("mibig-ripp")
-        html.add_detail_section("RiPP", FileTemplate(path.get_full_path(__file__, "ripp", "details.html")).render(data=results.data))
+        html.add_detail_section("RiPP", FileTemplate(path.get_full_path(__file__, "ripp", "details.html")).render(ripp=results.data["cluster"]["ripp"]))
         all_htmls.append(html)
 
     if "saccharide" in data["cluster"]:
         html = HTMLSections("mibig-saccharide")
-        html.add_detail_section("Saccharide", FileTemplate(path.get_full_path(__file__, "saccharide", "details.html")).render(data=results.data))
+        html.add_detail_section("Saccharide", FileTemplate(path.get_full_path(__file__, "saccharide", "details.html")).render(sac=results.data["cluster"]["saccharide"]))
         all_htmls.append(html)
 
     if "terpene" in data["cluster"]:
         html = HTMLSections("mibig-terpene")
-        html.add_detail_section("Terpene", FileTemplate(path.get_full_path(__file__, "terpene", "details.html")).render(data=results.data))
+        html.add_detail_section("Terpene", FileTemplate(path.get_full_path(__file__, "terpene", "details.html")).render(trp=results.data["cluster"]["terpene"]))
         all_htmls.append(html)
 
     html = HTMLSections("mibig-logs")

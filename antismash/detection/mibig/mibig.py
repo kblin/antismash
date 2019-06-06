@@ -56,16 +56,17 @@ def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
         # re-annotate CDSes
         for cds_feature in record.get_cds_features_within_location(cluster.location):
             locus_tag = cds_feature.locus_tag
+            protein_id = cds_feature.protein_id
             name = cds_feature.gene
             for annot in annotations["cluster"]["genes"].get("annotations", []):
                 if locus_tag and annot["id"] == locus_tag:
+                    pass
+                elif protein_id and annot["id"] == protein_id:
                     pass
                 elif name and annot.get("name", None) == name:
                     pass
                 else:
                     continue
-                #if "id" in annot:
-                #    cds_feature.locus_tag = annot["id"]
                 if "name" in annot:
                     cds_feature.gene = annot["name"]
                 if "product" in annot:

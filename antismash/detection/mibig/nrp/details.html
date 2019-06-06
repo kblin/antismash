@@ -1,5 +1,156 @@
 <div class="details">
     <div class="heading">
-        <span>NRP-specific information</span>
+       <span>NRP-specific information</span>
     </div>
+    <div>
+        <table border="1" style="width: 100%; margin-bottom: .4em;">
+            <tbody>
+                <tr>
+                    <td width="25%">
+                        <strong>Subclass</strong>
+                    </td>
+                    <td>
+                        {{nrp.get("subclass", "n/a")}}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="25%">
+                        <strong>Cyclic?</strong>
+                    </td>
+                    <td>
+                        {{"yes" if nrp.get("cyclic", False) else "no"}}
+                    </td>
+                </tr>
+                {% if nrp.get("release_type", [])|length > 0 %}
+                <tr>
+                    <td width="25%">
+                        <strong>Release type</strong>
+                    </td>
+                    <td>
+                        <ul style="padding: 0; margin: 0; list-style: none;">
+                            {% for rel in nrp["release_type"] %}
+                            <li>
+                                {{rel}}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if "lipid_moiety" in nrp %}
+                <tr>
+                    <td width="25%">
+                        <strong>Lipid moiety</strong>
+                    </td>
+                    <td>
+                        {{nrp["lipid_moiety"]}}
+                    </td>
+                </tr>
+                {% endif %}
+                {% if nrp.get("thioesterases", [])|length > 0 %}
+                <tr>
+                    <td width="25%">
+                        <strong>Thioesterase genes</strong>
+                    </td>
+                    <td>
+                        <ul style="padding: 0; margin: 0; list-style: none;">
+                            {% for te in nrp["thioesterases"] %}
+                            <li>
+                                {{te["gene"]}} ({{te["thioesterase_type"]}})
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </td>    
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% if nrp.get("nrps_genes", [])|length > 0 %}
+    <div class="heading">
+       <span>NRP-synthases</span>
+    </div>
+    <div>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th style="width: 9em; text-align:center;">Gene</th>
+                    <th style="min-width: 20em; text-align:center;">Modules</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nrps in nrp["nrps_genes"] %}
+                    {% for module in nrps.get("modules", [None]) %}
+                    <tr>
+                        {% if loop.index == 1 %}
+                        <td rowspan="{{nrps.get('modules', [None])|length}}" style="text-align:center; vertical-align: middle;">{{nrps["gene_id"]}}</td>
+                        {% endif %}
+                        <td style="min-width: 20em; text-align:left;">
+                        {% if module != None %}
+                            <div style="margin-bottom: 1em;">
+                                <strong>
+                                    Module {{module.get("module_number", "?")}}
+                                    {% if module.get("active", False) %}
+                                    [active]
+                                    {% endif %}
+                                    {% if "comments" in module %}
+                                    <div class="help-container" style="float: none;">
+                                        <div class="help-icon" data-id="mibig-help-nrp-nrps-module-{{loop.index}}" style="float: none; background-color: #006CA2;"></div>
+                                        <span class="help-tooltip" id="mibig-help-nrp-nrps-module-{{loop.index}}">{{module["comments"]}}</span>
+                                    </div>
+                                    {% endif %}
+                                </strong><br />
+                                {% if "a_substr_spec" in module %}
+                                {% set all_specs = module["a_substr_spec"].get("proteinogenic", [])|list + module["a_substr_spec"].get("nonproteinogenic", [])|list %}
+                                Specificity: {{"/".join(all_specs)}}<br />
+                                Evidence for specificity: <br />
+                                <ul style="margin: 0;">
+                                    {% for evidence in module["a_substr_spec"].get("evidence", []) %}
+                                    <li>
+                                        {{evidence}}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% if module["a_substr_spec"].get("aa_subcluster", [])|length > 0 %}
+                                Genes encoding specified AA: {{", ".join(module["a_substr_spec"]["aa_subcluster"])}}<br />
+                                {% endif %}                                
+                                {% endif %}
+                                {% if "c_dom_subtype" in module %}
+                                Condensation domain type: {{module["c_dom_subtype"]}} <br />
+                                {% endif %}
+                                {% if module.get("modification_domains", [])|length > 0 %}
+                                Modification domains: {{", ".join(module["modification_domains"])}}<br />
+                                {% endif %}
+                                {% if "non_canonical" in module %}
+                                Non-canonical activity: <br />
+                                <ul style="margin: 0;">
+                                    {% if module["non_canonical"].get("iterated", False) %}
+                                    <li>Iterated</li>
+                                    {% endif %}
+                                    {% if module["non_canonical"].get("non_elongating", False) %}
+                                    <li>Non-elongating</li>
+                                    {% endif %}
+                                    {% if module["non_canonical"].get("skipped", False) %}
+                                    <li>Skipped</li>
+                                    {% endif %}
+                                </ul>
+                                Evidence for non-canonical activity: <br />
+                                <ul style="margin: 0;">
+                                    {% for evidence in module["non_canonical"].get("evidence", []) %}
+                                    <li>
+                                        {{evidence}}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 </div>

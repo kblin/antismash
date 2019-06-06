@@ -54,7 +54,7 @@
                         <strong>Biosynthetic class(es)</strong>
                     </td>
                     <td>
-                        <ul style="padding: 0; margin: 0; list-style-image: none;">
+                        <ul style="padding: 0; margin: 0; list-style: none;">
                             {% for class in data["cluster"]["biosyn_class"] %}
                                 {{class}}
                                 {% if class.lower() in data["cluster"] %}
@@ -115,7 +115,7 @@
                     </td>
                     <td>
                         <i>{{data["cluster"]["loci"]["organism"]}}</i>
-                        [<a href="javascript: alert('{{'>'.join(data['cluster']['loci']['taxonomy'])}} (this is a temporary modal dialog)');">taxonomy</a>]
+                        [<a href="javascript: alert('{{'>'.join(data['cluster']['loci']['taxonomy'])}}');">taxonomy</a>]
                     </td>
                 </tr>
                 <tr>
@@ -125,7 +125,7 @@
                     <td>
                         <ul style="padding: 0; margin: 0; list-style: none;">
                             {% for pub in data["cluster"]["publications"] %}
-                            <li style="margin-bottom: 1em;">
+                            <li>
                                 {{pub}} (todo: auto-generate citation)
                             </li>
                             {% endfor %}
