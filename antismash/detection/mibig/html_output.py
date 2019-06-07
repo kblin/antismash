@@ -64,6 +64,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
                 function_text = function["category"]
                 if len(annot.get('tailoring', [])) > 0:
                     function_text += " ({}) ".format(", ".join(annot['tailoring']))
+                else:
+                    function_text += " "
                 for evidence in function['evidence']:
                     function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
                 gene["functions"].append(function_text)
@@ -85,6 +87,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
             function_text = function["category"]
             if len(annot.get('tailoring', [])) > 0:
                 function_text += " ({}) ".format(", ".join(annot['tailoring']))
+            else:
+                function_text += " "
             for evidence in function['evidence']:
                 function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
             gene["functions"].append(function_text)
