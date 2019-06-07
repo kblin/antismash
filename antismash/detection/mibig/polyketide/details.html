@@ -13,22 +13,25 @@
                             {{"/".join(pk.get("subclasses", []))}}
                         </td>
                     </tr>
-                    <tr>
                     {% if "starter_unit" in pk %}
-                    <td width="25%">
-                        <strong>Starter unit</strong>
-                    </td>
-                    <td>
+                    <tr>
+                        <td width="25%">
+                            <strong>Starter unit</strong>
+                        </td>
+                        <td>
                         {{pk["starter_unit"]}}
-                    </td>
+                        </td>
+                    </tr>
                     {% endif %}
                     {% if "ketide_length" in pk %}
-                    <td width="25%">
-                        <strong>Ketide length</strong>
-                    </td>
-                    <td>
-                        {{pk["ketide_length"]}}
-                    </td>
+                    <tr>
+                        <td width="25%">
+                            <strong>Ketide length</strong>
+                        </td>
+                        <td>
+                            {{pk["ketide_length"]}}
+                        </td>
+                    </tr>
                     {% endif %}
                     <tr>
                         <td width="25%">
@@ -54,7 +57,6 @@
                         </td>
                     </tr>
                     {% endif %}
-                </tr>
                 </tbody>
             </table>
         </div>

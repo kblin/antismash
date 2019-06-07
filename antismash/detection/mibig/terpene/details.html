@@ -2,4 +2,50 @@
     <div class="heading">
         <span>Terpene-specific information</span>
     </div>
+    <div>
+        <table border="1" style="width: 100%; margin-bottom: .4em;">
+            <tbody>
+                <tr>
+                    <td width="25%">
+                        <strong>Subclass</strong>
+                    </td>
+                    <td>
+                        {{trp.get("carbon_count_subclass", "Unknown")}}
+                        /
+                        {{trp.get("structural_subclass", "Unknown")}}
+                    </td>
+                </tr>
+                {% if "terpene_precursor" in trp %}
+                <tr>
+                    <td width="25%">
+                        <strong>Isoprenoid precursor</strong>
+                    </td>
+                    <td>
+                        {{trp["terpene_precursor"]}}
+                    </td>            
+                </tr>
+                {% endif %}
+                {% if trp.get("prenyltransferases", [])|length > 0 %}
+                <tr>
+                    <td width="25%">
+                        <strong>Prenyltransferases</strong>
+                    </td>
+                    <td>
+                        {{", ".join(trp["prenyltransferases"])}}
+                    </td>            
+                </tr>
+                {% endif %}
+                {% if trp.get("terpene_synth_cycl", [])|length > 0 %}
+                <tr>
+                    <td width="25%">
+                        <strong>Terpene synthases/cyclases</strong>
+                    </td>
+                    <td>
+                        {{", ".join(trp["terpene_synth_cycl"])}}
+                    </td>            
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>    
 </div>

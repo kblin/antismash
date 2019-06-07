@@ -63,7 +63,7 @@
                                     {% elif "subclasses" in data["cluster"][class.lower()]%}
                                         ({{"/".join(data["cluster"][class.lower()]["subclasses"])}})
                                     {% elif class=="Terpene" %}
-                                        ({{data["cluster"][class.lower()]["carbon_count_subclass"]}}{{"/{}".format(data["cluster"][class.lower()]["structural_subclass"])}})
+                                        ({{data["cluster"][class.lower()].get("carbon_count_subclass", "Unknown")}}{{"/{}".format(data["cluster"][class.lower()].get("structural_subclass", "Unknown"))}})
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}        

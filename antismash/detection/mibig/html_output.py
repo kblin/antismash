@@ -27,6 +27,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
     all_htmls.append(html)
 
     html = HTMLSections("mibig-compounds")
+    for compound in results.data["cluster"]["compounds"]:
+        compound["keys"] = [key for key in compound.keys() if (key not in ["compound", "chem_struct"]) and (not isinstance(compound[key], list) or len(compound[key]) > 0)]
     html.add_detail_section("Compounds", FileTemplate(path.get_full_path(__file__, "templates", "compounds.html")).render(compounds=results.data["cluster"]["compounds"]))
     all_htmls.append(html)
 

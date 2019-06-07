@@ -2,4 +2,55 @@
     <div class="heading">
         <span>Saccharide-specific information</span>
     </div>
+    <div>
+        <table border="1" style="width: 100%; margin-bottom: .4em;">
+            <tbody>
+                <tr>
+                    <td width="25%">
+                        <strong>Subclass</strong>
+                    </td>
+                    <td>
+                        {{sac.get("subclass", "Unknown")}}
+                    </td>
+                </tr>
+                {% if sac.get("sugar_subclusters", [])|length > 0 %}
+                <tr>
+                    <td width="25%">
+                        <strong>Sugar-encoding genes</strong>
+                    </td>
+                    <td>
+                        {{", ".join(sac["sugar_subclusters"])}}
+                    </td>
+                </tr>
+                {% endif %}
+                {% if sac.get("glycosyltransferases", [])|length > 0 %}
+                {% for gt in sac["glycosyltransferases"] %}
+                <tr>
+                    {% if loop.index == 1 %}
+                    <td rowspan="{{sac['glycosyltransferases']|length}}" style="text-align:left; vertical-align: text-top;">
+                        <strong>Glycosyltransferases</strong>
+                    </td>
+                    {% endif %}
+                    <td>
+                        <div style="margin-bottom: 1em;">
+                            <strong>
+                                >{{gt.get("gene_id", "?")}}
+                            </strong><br />
+                            Specificity: {{gt.get("specificity", "Unknown")}}<br />
+                            Evidence: <br />
+                            <ul style="padding:0; padding-left: 1em; margin:0;">
+                                {% for ev in gt.get("evidence", []) %}
+                                <li>
+                                    {{ev}}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>    
 </div>

@@ -67,8 +67,6 @@ def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
                     pass
                 else:
                     continue
-                if "name" in annot:
-                    cds_feature.gene = annot["name"]
                 if "product" in annot:
                     cds_feature.product = annot["product"]
 

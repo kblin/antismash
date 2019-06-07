@@ -8,20 +8,21 @@
             <table border="1" style="width: 100%">
                 <tbody>
                     <tr style="font-size: 12pt;">
-                    {% if compound["chem_struct"] %}
-                    <td rowspan="{{compound.keys()|length - 1}}" width="30%" style="text-align: center;">
+                    {% set keys = compound["keys"] %}
+                    {% if "chem_struct" in compound and compound["chem_struct"]|length > 0 %}
+                    <td rowspan="{{keys|length + 1}}" width="30%" style="text-align: center; vertical-align:middle;">
                         <canvas width="100%" class="smiles-canvas" data-smiles="{{compound['chem_struct']}}"></canvas>
                     </td>
                     {% else %}
-                    <td rowspan="{{compound.keys()|length}}" width="30%">
-                        <div width="100%" style="text-align: center;">(no structure information available)</div>
+                    <td rowspan="{{keys|length + 1}}" width="30%">
+                        <div width="100%" style="text-align: center; vertical-align:middle;">(no structure information available)</div>
                     </td>
                     {% endif %}
                     <td colspan="2">
                         <strong>{{compound["compound"]}}</strong>
                     </td>
                     </tr>
-                    {% for key in compound.keys() if key not in ["compound", "chem_struct"] %}
+                    {% for key in keys %}
                     <tr style="font-size: 10pt;">
                         <td width="15%"><strong>{{key}}</strong></td>
                         <td>
