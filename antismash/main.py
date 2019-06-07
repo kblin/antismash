@@ -470,6 +470,9 @@ def write_outputs(results: serialiser.AntismashResults, options: ConfigType) -> 
     logging.debug("Creating results page")
     if options.mibig_mode:
         html_mibig.write(results.records, module_results_per_record, options)
+        logging.debug("Saving mibig annotation file")
+        annotation_filename = "{}.json".format(os.path.splitext(os.path.basename(options.mibig_json))[0])
+        shutil.copy(options.mibig_json, os.path.join(options.output_dir, annotation_filename))
     else:
         html.write(results.records, module_results_per_record, options)
 

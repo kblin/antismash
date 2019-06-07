@@ -138,6 +138,8 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
         regions_written = sum(len(record.get_regions()) for record in records)
         job_id = os.path.basename(options.output_dir)
 
+        annotation_filename = "{}.json".format(os.path.splitext(os.path.basename(options.mibig_json))[0])
+
         html_sections = generate_html_sections(record_layers_with_regions, results_by_record_id, options)
 
         svg_tooltip = ("Shows the layout of the region, marking coding sequences and areas of interest. "
@@ -153,7 +155,8 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
                               results_by_record_id=results_by_record_id,
                               config=options, job_id=job_id, page_title=page_title,
                               records_without_regions=record_layers_without_regions,
-                              svg_tooltip=svg_tooltip)
+                              svg_tooltip=svg_tooltip,
+                              annotation_filename=annotation_filename)
         result_file.write(aux)
 
 
