@@ -110,7 +110,7 @@ def get_output_modules() -> List[AntismashModule]:
         Returns:
             a list of modules
     """
-    return [html]  # type: ignore  # a lot of casting avoided
+    return [html, html_mibig]  # type: ignore  # a lot of casting avoided
 
 
 def verify_options(options: ConfigType, modules: List[AntismashModule]) -> bool:

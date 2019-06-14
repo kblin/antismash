@@ -6,9 +6,12 @@
 """
 
 import glob
+import logging
 import os
 import shutil
 from typing import Dict, List, Optional
+
+import scss
 
 from antismash.common import path
 from antismash.common.module_results import ModuleResults
@@ -21,14 +24,39 @@ NAME = "html_mibig"
 SHORT_DESCRIPTION = "HTML output for mibig-mode"
 
 
+def get_arguments() -> ModuleArgs:
+    """ Builds the arguments for the HMTL output module """
+    return ModuleArgs("Output options", "html")
+
+
+def prepare_data(_logging_only: bool = False) -> List[str]:
+    """ Rebuild any dynamically buildable data """
+    with path.changed_directory(path.get_full_path(__file__, "css")):
+        built_file = os.path.abspath("mibig.css")
+
+        if path.is_outdated(built_file, glob.glob("*.scss")):
+            logging.info("CSS files out of date, rebuilding")
+
+            result = scss.Compiler(output_style="expanded").compile("mibig.scss")
+            assert result
+            with open("mibig.css", "w") as out:
+                out.write(result)
+    return []
+
+
+def check_prereqs(_options: ConfigType) -> List[str]:
+    """ Check prerequisites """
+    return prepare_data()
+
+
 def check_options(_options: ConfigType) -> List[str]:
     """ Check options, but none to check """
     return []
 
 
-def is_enable(_options: ConfigType) -> bool:
+def is_enabled(options: ConfigType) -> bool:
     """ Is the HMTL module enabled (currently always enabled) """
-    return True  # TODO: add an arg to disable
+    return options.mibig_mode
 
 
 def write(records: List[Record], results: List[Dict[str, ModuleResults]],
