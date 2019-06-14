@@ -12,11 +12,11 @@
         {{data["cluster"]["mibig_accession"]}}: {{data["cluster"]["compounds"][0]["compound"]}} biosynthetic gene cluster from <i>{{data["cluster"]["loci"]["organism"]}}</i>
         {{help_tooltip(svg_tooltip, "region_svg")}}
       </div>
-      <div class="contig-edge-warning">
-        <a href="./generated/index.html#r1c1" style="background: none;">View antiSMASH-generated output</a>
+      <div class="region-download">
+        <a href="./generated/index.html#r1c1">View antiSMASH-generated output</a>
       </div>
       <div class="region-download">
-        <a style="background: none;" href="{{ '%s.region%03d.gbk' % (record.id, region.get_region_number()) }}"">Download Cluster GenBank file</a>
+        <a href="{{ '%s.region%03d.gbk' % (record.id, region.get_region_number()) }}"">Download Cluster GenBank file</a>
       </div>
       <div class = 'description-text'>
         {{region.description_text()}}.

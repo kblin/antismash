@@ -93,20 +93,12 @@
   <script src="js/antismash.js"></script>
   <script src="regions.js"></script>
   <script>
-
     $(document).ready(function() {
+        window.location.href = "#r1c1";
+        window.scrollTo(0, 0);
         viewer["start"](all_regions, details_data, recordData);
-        $(".regbutton").last().click();
-        document.addEventListener("keyup", function keyUpEvent(event) {
-            const key = event.keyCode;
-            if (key === 37) {  // left arrow
-              $(".regbutton").last().click();
-            } else if (key === 39) {  // right arrow
-              $(".regbutton").last().click();
-            }
-        }, false);
+        document.removeEventListener("keyup", null);
     })
-
   </script>
 
 </body>
