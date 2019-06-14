@@ -1,4 +1,3 @@
-{% import 'region_table_macros.html' as region_table %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,80 +10,7 @@
 <body>
   <div id="header">
     {% include 'header.html' %}
-    <div id="buttons" style="display: none;">
-      <span id="region-type">Select genomic region:</span>
-      <div id="regionbuttons">
-        <div class="arrow-left" id="prev-region"></div>
-        <div class="regbutton" style="min-width: inherit;"><a href="#">Overview</a></div>
-        <div style="display: flex; flex-wrap: wrap">
-        {% for record in records %}
-          {% for region in record.regions %}
-            {% set hybrid_text = "" %}
-            {% if region.products | length > 1 %}
-                {% set hybrid_text = "hybrid " %}
-            {% endif %}
-            <div class="regbutton {{region.get_product_string()}} {{hybrid_text}}{{region.anchor_id}}">
-              <a href="#{{region.anchor_id}}">{{record.record_index}}.{{region.get_region_number()}}</a>
-            </div>
-          {% endfor %}
-        {% endfor %}
-        </div>
-        <div id="last-regbutton"><div class="arrow-right" id="next-region"></div></div>
-      </div>
-    </div>
   </div>
-
-  <!-- overview page -->
-  {% if records %}
-  <div class="page" id="overview" style="display: none;">
-   {% if options.triggered_limit %}
-     <h3>Identified secondary metabolite regions (truncated to the first {{options.limit}} record(s)) <span id="truncated"></span></h3>
-   {% else %}
-     <h3>Identified secondary metabolite regions<span id="truncated"></span></h3>
-   {% endif %}
-   <div class="overview-layout">
-    <div id="record-tables">
-     <div id="single-record-tables">
-     {% for record in records -%}
-      <div class="record-overview-header">
-       {{record.get_from_record()}}
-      </div>
-      <div class="record-overview-details">
-        <svg id="record-minimap-{{record.record_index}}" class="record-overview-svg" height="1" width="1"></svg>
-        {{ region_table.single_record_table(record, multi_record, options) }}
-      </div>
-     {%- endfor %}
-     </div>
-     {% if multi_record %}
-     <div id="compact-record-table" style="display: none;">
-      <div class="record-table">
-       {{ region_table.compact_records_table(records, options) }}
-      </div>
-     </div>
-     {% endif %}
-     {% if records_without_regions %}
-     <dl id="regionless-records">
-      <dt class="record-overview-header">No secondary metabolite regions were found in these records:</dt>
-       {% for record in records_without_regions %}
-         <dd>{{record.get_from_record()}}</dd>
-       {% endfor %}
-     </dl>
-     {% endif %}
-    </div>
-    {% if multi_record %}
-    <div class="overview-switches">
-     {{switch("Compact view", "overview-switch-compact")}}
-    </div>
-    {% endif %}
-   </div>
-  </div>
-  {% else %}
-  <div class="page" id="overview">
-    <div class="no-results">No results found on input.</div>
-  </div>
-  {% endif %}
-
-  <div style="margin-bottom: 0.5em;">&nbsp;</div>
 
 {% include 'regions.html' %}
 {% include 'footer.html' %}
