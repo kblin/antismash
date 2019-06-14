@@ -43,6 +43,8 @@ class OptionsLayer:
     @property
     def base_url(self) -> str:
         """ Returns the 'home' URL for fungismash/antismash """
+        if self.options.mibig_mode:
+            return self.options.urls.mibig_baseurl
         if self.options.taxon == "fungi":
             return self.options.urls.fungi_baseurl
         return self.options.urls.bacteria_baseurl
