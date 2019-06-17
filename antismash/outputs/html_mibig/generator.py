@@ -5,17 +5,21 @@
 
 import json
 import string
-import os
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, cast
 
 from antismash.common import path, module_results
 from antismash.common.html_renderer import FileTemplate, HTMLSections, docs_link
 from antismash.common.layers import RecordLayer, OptionsLayer
 from antismash.common.secmet import Record
-from antismash.common.json import JSONOrf
-from antismash.config import ConfigType
-from antismash.outputs.html_mibig import js
 from antismash.custom_typing import AntismashModule
+from antismash.detection import nrps_pks_domains
+from antismash.config import ConfigType
+from antismash.outputs.html import js
+from antismash.outputs.html.generator import (
+    find_plugins_for_cluster,
+    generate_searchgtr_htmls,
+    write_regions_js,
+)
 
 
 def build_json_data(records: List[Record], results: List[Dict[str, module_results.ModuleResults]],
@@ -44,6 +48,8 @@ def build_json_data(records: List[Record], results: List[Dict[str, module_result
         json_record['seq_id'] = "".join(char for char in json_record['seq_id'] if char in string.printable)
         for region, json_region in zip(record.get_regions(), json_record['regions']):
             handlers = find_plugins_for_cluster(get_all_modules(), json_region)
+            if nrps_pks_domains not in handlers and nrps_pks_domains.domain_drawing.has_domain_details(region):
+                handlers.append(cast(AntismashModule, nrps_pks_domains))
             for handler in handlers:
                 # if there's no results for the module, don't let it try
                 if handler.__name__ not in results[i]:
@@ -95,9 +101,14 @@ def generate_html_sections(records: List[RecordLayer], results: Dict[str, Dict[s
         record_details = {}
         record_result = results[record.id]
         for region in record.regions:
+            # work around mibig module not creating protoclusters with the expected types
+            assert len(region.subregions) == 1 and region.subregions[0].tool == "mibig"
+            if nrps_pks_domains.domain_drawing.has_domain_details(region.region_feature):
+                region.handlers.append(cast(AntismashModule, nrps_pks_domains))
+
             sections = []
             for handler in region.handlers:
-                if handler.will_handle(region.products):
+                if handler.will_handle(region.products) or handler is nrps_pks_domains:
                     handler_results = record_result.get(handler.__name__)
                     if handler_results is None:
                         continue
