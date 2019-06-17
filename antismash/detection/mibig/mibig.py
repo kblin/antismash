@@ -43,7 +43,7 @@ def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
                 # todo: check if exist in gbk
                 exons = [FeatureLocation(exon["start"] - 1, exon["end"], strand=gene["location"]["strand"]) for exon in gene["location"]["exons"]]
                 location = CompoundLocation(exons) if len(exons) > 1 else exons[0]
-                translation = gene.get("translation", "") # what to do if no translation available?
+                translation = gene.get("translation", record.get_aa_translation_from_location(location))
                 cds_feature = CDSFeature(location=location, locus_tag=gene["id"], translation=translation)
                 record.add_cds_feature(cds_feature)
 
