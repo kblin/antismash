@@ -48,13 +48,13 @@
                     <td>
                         <div style="margin-bottom: 1em;">
                             <strong>
-                                >{{precursor.get("gene_id", "?")}}
+                                >{{precursor["gene_id"]}}
                             </strong><br />
                             Leader sequence: {{precursor.get("leader_sequence", "?")}}<br />
                             Recognition motif: {{precursor.get("recognition_motif", "?")}}<br />
                             Core sequences: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for seq in precursor.get("core_sequence", []) %}
+                                {% for seq in precursor["core_sequence"] %}
                                 <li>
                                     {{seq}}
                                 </li>
@@ -67,7 +67,7 @@
                                 {% for cl in precursor["crosslinks"] %}
                                 <li>
                                     {{cl.get("first_AA", "?")}}x{{cl.get("second_AA", "?")}}
-                                    ({{cl.get("crosslink_type", "?")}})
+                                    ({{cl["crosslink_type"]}})
                                 </li>
                                 {% endfor %}
                             </ul>

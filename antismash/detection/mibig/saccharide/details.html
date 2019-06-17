@@ -35,10 +35,10 @@
                             <strong>
                                 >{{gt.get("gene_id", "?")}}
                             </strong><br />
-                            Specificity: {{gt.get("specificity", "Unknown")}}<br />
+                            Specificity: {{gt["specificity"]}}<br />
                             Evidence: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for ev in gt.get("evidence", []) %}
+                                {% for ev in gt["evidence"] %}
                                 <li>
                                     {{ev}}
                                 </li>

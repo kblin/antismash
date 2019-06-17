@@ -102,13 +102,13 @@
                             {% if "iterative" in pks %}
                             {% set iterative = pks["iterative"] %}
                             {% if "genes" in iterative %}
-                            <strong>Iterative PKS genes:</strong> {{", ".join(iterative.get("genes", []))}}<br />
+                            <strong>Iterative PKS genes:</strong> {{", ".join(iterative["genes"])}}<br />
                             {% endif %}
                             <strong>Iterative PKS type:</strong> {{iterative["subtype"]}}, {{iterative["cyclization_type"]}}<br />
                             <strong>Iteration counts:</strong> {{iterative["nr_iterations"]}}<br />
                             {% if "evidence" in iterative %}
                             <ul style="margin: 0;">
-                                {% for evidence in iterative.get("evidence", []) %}
+                                {% for evidence in iterative["evidence"] %}
                                 <li>
                                     {{evidence}}
                                 </li>
