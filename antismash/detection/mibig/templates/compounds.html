@@ -9,7 +9,7 @@
                 <tbody>
                     <tr style="font-size: 14pt;">
                     {% set keys = compound["keys"] %}
-                    {% if "chem_struct" in compound and compound["chem_struct"]|length > 0 %}
+                    {% if compound.get("chem_struct") %}
                     <td rowspan="{{keys|length + 1}}" width="30%" style="text-align: center; vertical-align:middle;">
                         <canvas width="100%" class="smiles-canvas" data-smiles="{{compound['chem_struct']}}"></canvas>
                         <div class="focus-clipboard">
@@ -23,7 +23,7 @@
                     {% endif %}
                     <td colspan="2" style="vertical-align: text-top;">
                         <strong>{{compound["compound"]}}</strong>
-                        {% if compound.get("chem_synonyms", [])|length > 0 %}
+                        {% if compound.get("chem_synonyms") %}
                         [<a href="javascript: alert('This compound is also known as: {{'; '.join(compound['chem_synonyms'])}}');">synonyms</a>]
                         {% endif %}
                     </td>
@@ -38,7 +38,7 @@
                         </td>
                     </tr>
                     {% endif %}
-                    {% if compound.get("database_id", [])|length > 0 %}
+                    {% if compound.get("database_id", []) %}
                     <tr>
                         <td width="25%" style="vertical-align: text-top;">
                             <strong>References</strong>

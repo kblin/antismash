@@ -5,10 +5,12 @@
 
 import json
 import string
+import os
 from typing import Any, Dict, List, Tuple, Union, cast
 
 from antismash.common import path, module_results
-from antismash.common.html_renderer import FileTemplate, HTMLSections, docs_link
+from antismash.common.html_renderer import FileTemplate, HTMLSections
+from antismash.common.json import JSONOrf
 from antismash.common.layers import RecordLayer, OptionsLayer
 from antismash.common.secmet import Record
 from antismash.custom_typing import AntismashModule
@@ -62,25 +64,6 @@ def build_json_data(records: List[Record], results: List[Dict[str, module_result
     return js_records, js_domains
 
 
-def write_regions_js(records: List[Dict[str, Any]], output_dir: str,
-                     js_domains: List[Dict[str, Any]]) -> None:
-    """ Writes out the cluster and domain JSONs to file for the javascript sections
-        of code"""
-    with open(os.path.join(output_dir, 'regions.js'), 'w') as handle:
-        handle.write("var recordData = %s;\n" % json.dumps(records, indent=4))
-        regions = {"order": []}  # type: Dict[str, Any]
-        for record in records:
-            for region in record['regions']:
-                regions[region['anchor']] = region
-                regions['order'].append(region['anchor'])
-        handle.write('var all_regions = %s;\n' % json.dumps(regions, indent=4))
-
-        clustered_domains = {}
-        for region in js_domains:
-            clustered_domains[region['id']] = region
-        handle.write('var details_data = %s;\n' % json.dumps(clustered_domains, indent=4))
-
-
 def generate_html_sections(records: List[RecordLayer], results: Dict[str, Dict[str, module_results.ModuleResults]],
                            options: ConfigType) -> Dict[str, Dict[int, List[HTMLSections]]]:
     """ Generates a mapping of record->region->HTMLSections for each record, region and module
@@ -112,11 +95,7 @@ def generate_html_sections(records: List[RecordLayer], results: Dict[str, Dict[s
                     handler_results = record_result.get(handler.__name__)
                     if handler_results is None:
                         continue
-                    html = handler.generate_html(region, handler_results, record, options)
-                    if isinstance(html, list):
-                        sections.extend(html)
-                    else:
-                        sections.append(html)
+                    sections.append(handler.generate_html(region, handler_results, record, options))
             record_details[region.get_region_number()] = sections
         details[record.id] = record_details
     return details
@@ -169,50 +148,3 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
                               svg_tooltip=svg_tooltip,
                               annotation_filename=annotation_filename)
         result_file.write(aux)
-
-
-def find_plugins_for_cluster(plugins: List[AntismashModule], cluster: Dict[str, Any]) -> List[AntismashModule]:
-    "Find a specific plugin responsible for a given gene cluster type"
-    products = cluster['products']
-    handlers = []
-    for plugin in plugins:
-        if not hasattr(plugin, 'will_handle'):
-            continue
-        if plugin.will_handle(products):
-            handlers.append(plugin)
-    return handlers
-
-
-def load_searchgtr_search_form_template() -> List[str]:
-    """ for SEARCHGTR HTML files, load search form template """
-    with open(path.get_full_path(__file__, "templates", "searchgtr_form.html"), "r") as handle:
-        template = handle.read().replace("\r", "\n")
-    return template.split("FASTASEQUENCE")
-
-
-def generate_searchgtr_htmls(records: List[Record], options: ConfigType) -> None:
-    """ Generate lists of COGs that are glycosyltransferases or transporters """
-    gtrcoglist = ['SMCOG1045', 'SMCOG1062', 'SMCOG1102']
-    searchgtrformtemplateparts = load_searchgtr_search_form_template()
-    # TODO store somewhere sane
-    js.searchgtr_links = {}
-    for record in records:
-        for feature in record.get_cds_features():
-            smcog_functions = feature.gene_functions.get_by_tool("smcogs")
-            if not smcog_functions:
-                continue
-            smcog = smcog_functions[0].description.split(":")[0]
-            if smcog not in gtrcoglist:
-                continue
-            html_dir = os.path.join(options.output_dir, "html")
-            if not os.path.exists(html_dir):
-                os.mkdir(html_dir)
-            formfileloc = os.path.join(html_dir, feature.get_name() + "_searchgtr.html")
-            link_loc = os.path.join("html", feature.get_name() + "_searchgtr.html")
-            gene_id = feature.get_name()
-            js.searchgtr_links[record.id + "_" + gene_id] = link_loc
-            with open(formfileloc, "w") as formfile:
-                specificformtemplate = searchgtrformtemplateparts[0].replace("GlycTr", gene_id)
-                formfile.write(specificformtemplate)
-                formfile.write("%s\n%s" % (gene_id, feature.translation))
-                formfile.write(searchgtrformtemplateparts[1])

@@ -18,10 +18,10 @@
                         <strong>Cyclic?</strong>
                     </td>
                     <td>
-                        {{"yes" if ripp.get("cyclic", False) else "no"}}
+                        {{"yes" if ripp.get("cyclic") else "no"}}
                     </td>
                 </tr>
-                {% if ripp.get("peptidases", [])|length > 0 %}
+                {% if "peptidases" in ripp %}
                 <tr>
                     <td width="25%">
                         <strong>Peptidases</strong>
@@ -37,7 +37,7 @@
                     </td>    
                 </tr>
                 {% endif %}
-                {% if ripp.get("precursor_genes", [])|length > 0 %}
+                {% if "precursor_genes" in ripp %}
                 {% for precursor in ripp["precursor_genes"] %}
                 <tr>
                     {% if loop.index == 1 %}
@@ -61,10 +61,10 @@
                                 {% endfor %}
                             </ul>
                             Follower sequence: {{precursor.get("follower_sequence", "?")}}<br />
-                            {% if precursor.get("crosslinks", [])|length > 0 %}
+                            {% if precursor.get("crosslinks") %}
                             Crosslinks: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for cl in precursor.get("crosslinks", []) %}
+                                {% for cl in precursor["crosslinks"] %}
                                 <li>
                                     {{cl.get("first_AA", "?")}}x{{cl.get("second_AA", "?")}}
                                     ({{cl.get("crosslink_type", "?")}})
@@ -72,10 +72,10 @@
                                 {% endfor %}
                             </ul>
                             {% endif %}
-                            {% if precursor.get("cleavage_recogn_site", [])|length > 0 %}
+                            {% if precursor.get("cleavage_recogn_site") %}
                             Cleavage recognition sites: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for site in precursor.get("cleavage_recogn_site", []) %}
+                                {% for site in precursor["cleavage_recogn_site"] %}
                                 <li>
                                     {{site}}
                                 </li>

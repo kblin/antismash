@@ -18,10 +18,10 @@
                         <strong>Cyclic?</strong>
                     </td>
                     <td>
-                        {{"yes" if nrp.get("cyclic", False) else "no"}}
+                        {{"yes" if nrp.get("cyclic") else "no"}}
                     </td>
                 </tr>
-                {% if nrp.get("release_type", [])|length > 0 %}
+                {% if nrp.get("release_type") %}
                 <tr>
                     <td width="25%">
                         <strong>Release type</strong>
@@ -47,7 +47,7 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if nrp.get("thioesterases", [])|length > 0 %}
+                {% if nrp.get("thioesterases") %}
                 <tr>
                     <td width="25%">
                         <strong>Thioesterase genes</strong>
@@ -66,7 +66,7 @@
             </tbody>
         </table>
     </div>
-    {% if nrp.get("nrps_genes", [])|length > 0 %}
+    {% if nrp.get("nrps_genes") %}
     <div class="heading">
        <span>NRP-synthases</span>
     </div>
@@ -111,26 +111,26 @@
                                     </li>
                                     {% endfor %}
                                 </ul>
-                                {% if module["a_substr_spec"].get("aa_subcluster", [])|length > 0 %}
+                                {% if module["a_substr_spec"].get("aa_subcluster") %}
                                 Genes encoding specified AA: {{", ".join(module["a_substr_spec"]["aa_subcluster"])}}<br />
                                 {% endif %}                                
                                 {% endif %}
                                 {% if "c_dom_subtype" in module %}
                                 Condensation domain type: {{module["c_dom_subtype"]}} <br />
                                 {% endif %}
-                                {% if module.get("modification_domains", [])|length > 0 %}
+                                {% if module.get("modification_domains") %}
                                 Modification domains: {{", ".join(module["modification_domains"])}}<br />
                                 {% endif %}
                                 {% if "non_canonical" in module %}
                                 Non-canonical activity: <br />
                                 <ul style="margin: 0;">
-                                    {% if module["non_canonical"].get("iterated", False) %}
+                                    {% if module["non_canonical"].get("iterated") %}
                                     <li>Iterated</li>
                                     {% endif %}
-                                    {% if module["non_canonical"].get("non_elongating", False) %}
+                                    {% if module["non_canonical"].get("non_elongating") %}
                                     <li>Non-elongating</li>
                                     {% endif %}
-                                    {% if module["non_canonical"].get("skipped", False) %}
+                                    {% if module["non_canonical"].get("skipped") %}
                                     <li>Skipped</li>
                                     {% endif %}
                                 </ul>

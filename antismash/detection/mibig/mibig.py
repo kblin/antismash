@@ -4,11 +4,10 @@
 """ MiBIG specific sideloading """
 
 import json
-import logging
 from typing import Any, Dict, List
 
 from antismash.common.module_results import DetectionResults
-from antismash.common.secmet import CDSFeature, Protocluster, Record, SubRegion
+from antismash.common.secmet import CDSFeature, Protocluster, Record
 from antismash.common.secmet.locations import FeatureLocation, CompoundLocation
 
 
@@ -34,12 +33,12 @@ def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
     product = ", ".join(annotations["cluster"]["biosyn_class"])
     loci = annotations["cluster"]["loci"]
     assert loci["accession"] == record.id
-    start = loci.get("start_coord", 1) - 1 
+    start = loci.get("start_coord", 1) - 1
     end = loci.get("end_coord", len(record.seq))
     cluster = Protocluster(FeatureLocation(start, end), FeatureLocation(start, end),
-                                tool="mibig", cutoff=-1,
-                                neighbourhood_range=0, product=product,
-                                detection_rule="")
+                           tool="mibig", cutoff=-1,
+                           neighbourhood_range=0, product=product,
+                           detection_rule="")
     results.clusters.append(cluster)
 
     if "genes" in annotations["cluster"]:
@@ -47,7 +46,7 @@ def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
         for gene in annotations["cluster"]["genes"].get("extra_genes", []):
             if "id" in gene and "location" in gene:
                 # todo: check if exist in gbk
-                exons = [FeatureLocation(exon["start"] - 1, exon["end"], strand=gene["location"]["strand"])for exon in gene["location"]["exons"]]
+                exons = [FeatureLocation(exon["start"] - 1, exon["end"], strand=gene["location"]["strand"]) for exon in gene["location"]["exons"]]
                 location = CompoundLocation(exons) if len(exons) > 1 else exons[0]
                 translation = gene.get("translation", "") # what to do if no translation available?
                 cds_feature = CDSFeature(location=location, locus_tag=gene["id"], translation=translation)

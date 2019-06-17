@@ -25,7 +25,7 @@
                     </td>            
                 </tr>
                 {% endif %}
-                {% if trp.get("prenyltransferases", [])|length > 0 %}
+                {% if trp.get("prenyltransferases") %}
                 <tr>
                     <td width="25%">
                         <strong>Prenyltransferases</strong>
@@ -35,7 +35,7 @@
                     </td>            
                 </tr>
                 {% endif %}
-                {% if trp.get("terpene_synth_cycl", [])|length > 0 %}
+                {% if trp.get("terpene_synth_cycl") %}
                 <tr>
                     <td width="25%">
                         <strong>Terpene synthases/cyclases</strong>

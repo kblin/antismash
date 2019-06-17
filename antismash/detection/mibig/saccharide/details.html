@@ -13,7 +13,7 @@
                         {{sac.get("subclass", "Unknown")}}
                     </td>
                 </tr>
-                {% if sac.get("sugar_subclusters", [])|length > 0 %}
+                {% if sac.get("sugar_subclusters") %}
                 <tr>
                     <td width="25%">
                         <strong>Sugar-encoding genes</strong>
@@ -23,8 +23,7 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if sac.get("glycosyltransferases", [])|length > 0 %}
-                {% for gt in sac["glycosyltransferases"] %}
+                {% for gt in sac.get("glycosyltransferases", []) %}
                 <tr>
                     {% if loop.index == 1 %}
                     <td rowspan="{{sac['glycosyltransferases']|length}}" style="text-align:left; vertical-align: text-top;">
@@ -49,7 +48,6 @@
                     </td>
                 </tr>
                 {% endfor %}
-                {% endif %}
             </tbody>
         </table>
     </div>    

@@ -13,26 +13,25 @@
 
  <strong>Functions (annotated):</strong>
  <br>
- {% if annotation and annotation.get('functions', [])|length > 0 %}
  <div>
+   {% if annotation and annotation.get('functions') %}
      {% for function in annotation['functions'] %}
        {{function['category']}}
-       {% if annotation.get('tailoring', [])|length > 0 %}
+       {% if annotation.get('tailoring') %}
         ({{", ".join(annotation['tailoring'])}})
        {% endif %}
        {% for evidence in function['evidence'] %}
         <span class='mibig-gf-evidence-{{evidence[0]}}' title='{{evidence}}'>{{evidence[0]}}</span>
        {% endfor %}
      {% endfor %}
- </div>
- {% else %}
- <div>
+   {% else %}
      -
+   {% endif %}
  </div>
  {% endif %}
  <br>
- </div>
- <div class="focus-info">
+</div>
+<div class="focus-info">
  <strong>Functions (generated):</strong>
  <br>
  {% for gene_function in feature.gene_functions %}

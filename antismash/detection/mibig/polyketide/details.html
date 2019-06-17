@@ -41,7 +41,7 @@
                             {{"yes" if pk.get("cyclic", False) else "no"}}
                         </td>
                     </tr>
-                    {% if pk.get("release_type", [])|length > 0 %}
+                    {% if pk.get("release_type") %}
                     <tr>
                         <td width="25%">
                             <strong>Release type</strong>
@@ -60,7 +60,7 @@
                 </tbody>
             </table>
         </div>
-        {% if pk.get("synthases", [])|length > 0 %}
+        {% if pk.get("synthases") %}
         <div class="heading">
            <span>Polyketide-synthases</span>
         </div>
@@ -86,7 +86,7 @@
                             {% if "trans_at" in pks %}
                             <strong>Trans-acyltansferases:</strong> {{", ".join(pks["trans_at"].get("genes", []))}}<br />
                             {% endif %}
-                            {% if pks.get("thioesterases", [])|length > 0 %}
+                            {% if pks.get("thioesterases") %}
                             <strong>Thioesterases:</strong><br />
                             <ul style="padding: 0; padding-left: 1em; margin: 0;">
                                 {% for te in pks["thioesterases"] %}
@@ -123,7 +123,7 @@
                             <div style="margin-bottom: 1em;">
                                 <strong>
                                     Module {{module.get("module_number", "?")}}
-                                    {% if module.get("comments", "")|length > 0 %}
+                                    {% if module.get("comments") %}
                                     <div class="help-container" style="float: none;">
                                         <div class="help-icon" data-id="mibig-help-pk-pks-module-{{loop.index}}" style="float: none; background-color: #006CA2;"></div>
                                         <span class="help-tooltip" id="mibig-help-pk-pks-module-{{loop.index}}">{{module["comments"]}}</span>
@@ -134,13 +134,13 @@
                                 Specificity: {{"/".join(module["at_specificities"])}}<br />
                                 Evidence for specificity: {{module.get("evidence", "?")}}<br />
                                 {% endif %}
-                                {% if module.get("genes", [])|length > 0 %}
+                                {% if module.get("genes") %}
                                 Genes: {{", ".join(module["genes"])}}<br />
                                 {% endif %}
-                                {% if module.get("domains", [])|length > 0 %}
+                                {% if module.get("domains") %}
                                 Core domains: {{", ".join(module["domains"])}}<br />
                                 {% endif %}
-                                {% if module.get("pks_mod_doms", [])|length > 0 %}
+                                {% if module.get("pks_mod_doms") %}
                                 Scaffold-modifying domains: {{", ".join(module["pks_mod_doms"])}}<br />
                                 {% endif %}
                                 {% if "kr_stereochem" in module %}
@@ -149,13 +149,13 @@
                                 {% if "non_canonical" in module %}
                                 Non-canonical activity: <br />
                                 <ul style="margin: 0;">
-                                    {% if module["non_canonical"].get("iterated", False) %}
+                                    {% if module["non_canonical"].get("iterated") %}
                                     <li>Iterated</li>
                                     {% endif %}
-                                    {% if module["non_canonical"].get("non_elongating", False) %}
+                                    {% if module["non_canonical"].get("non_elongating") %}
                                     <li>Non-elongating</li>
                                     {% endif %}
-                                    {% if module["non_canonical"].get("skipped", False) %}
+                                    {% if module["non_canonical"].get("skipped") %}
                                     <li>Skipped</li>
                                     {% endif %}
                                 </ul>
