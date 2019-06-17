@@ -11,9 +11,14 @@
                     {% set keys = compound["keys"] %}
                     {% if compound.get("chem_struct") %}
                     <td rowspan="{{keys|length + 1}}" width="30%" style="text-align: center; vertical-align:middle;">
-                        <canvas width="100%" class="smiles-canvas" data-smiles="{{compound['chem_struct']}}"></canvas>
+                        <canvas id="compound-drawing" width="100%" class="smiles-canvas" data-smiles="{{compound['chem_struct']}}"></canvas>
                         <div class="focus-clipboard">
                             <span class="clipboard-copy" data-seq="{{compound['chem_struct']}}">Copy SMILES</span>
+                        </div>
+                        <div id="compound-drawing-modal" class="modal-container">
+                            <div class="modal-content">
+                                <canvas class="smiles-canvas-modal" data-smiles="{{compound['chem_struct']}}"></canvas>
+                            </div>
                         </div>
                     </td>
                     {% else %}
