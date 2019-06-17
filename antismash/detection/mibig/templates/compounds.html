@@ -7,50 +7,59 @@
         <div style="margin-bottom: 0.25em;">
             <table border="1" style="width: 100%">
                 <tbody>
-                    <tr style="font-size: 12pt;">
+                    <tr style="font-size: 14pt;">
                     {% set keys = compound["keys"] %}
                     {% if "chem_struct" in compound and compound["chem_struct"]|length > 0 %}
                     <td rowspan="{{keys|length + 1}}" width="30%" style="text-align: center; vertical-align:middle;">
                         <canvas width="100%" class="smiles-canvas" data-smiles="{{compound['chem_struct']}}"></canvas>
+                        <div class="focus-clipboard">
+                            <span class="clipboard-copy" data-seq="{{compound['chem_struct']}}">Copy SMILES</span>
+                        </div>
                     </td>
                     {% else %}
                     <td rowspan="{{keys|length + 1}}" width="30%">
                         <div width="100%" style="text-align: center; vertical-align:middle;">(no structure information available)</div>
                     </td>
                     {% endif %}
-                    <td colspan="2">
+                    <td colspan="2" style="vertical-align: text-top;">
                         <strong>{{compound["compound"]}}</strong>
+                        {% if compound.get("chem_synonyms", [])|length > 0 %}
+                        [<a href="javascript: alert('This compound is also known as: {{'; '.join(compound['chem_synonyms'])}}');">synonyms</a>]
+                        {% endif %}
                     </td>
                     </tr>
-                    {% for key in keys %}
-                    <tr style="font-size: 10pt;">
-                        <td width="15%"><strong>{{key}}</strong></td>
-                        <td>
-                        {% if compound[key] is iterable and compound[key] is not string%}
-                        <ul style="padding:0; margin:0; list-style: none;">
-                            {% for valu in compound[key] %}
-                            <li>
-                                {% if key == "chem_targets" %}
-                                    {{valu['target']}}
-                                    {% if valu.get('publications', [])|length > 0 %}
-                                        ({{", ".join(valu['publications'])}})
-                                    {% endif %}
-                                {% else %}
-                                 {{valu}}
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                          {% if key == "mol_mass" %}
-                            {{compound[key]}} g/mol
-                          {% else %}
-                            {{compound[key]}}
-                          {% endif %}
-                        {% endif %}
+                    {% if "molecular_formula" in compound %}
+                    <tr>
+                        <td width="25%" style="vertical-align: text-top;">
+                            <strong>Molecular Formula</strong>
+                        </td>
+                        <td style="vertical-align: text-top;">
+                            {{compound["molecular_formula"]}}
                         </td>
                     </tr>
-                    {% endfor %}
+                    {% endif %}
+                    {% if compound.get("database_id", [])|length > 0 %}
+                    <tr>
+                        <td width="25%" style="vertical-align: text-top;">
+                            <strong>References</strong>
+                        </td>
+                        <td style="vertical-align: text-top;">
+                            {% for ref in compound["database_id"] %}
+                            {% set db_id = ref.split(':')[1] %}
+                            {% if ref.startswith("pubchem:") %}
+                            <a href="https://pubchem.ncbi.nlm.nih.gov/compound/{{db_id}}">PubCHEM</a>&nbsp;&nbsp;
+                            {% elif ref.startswith("chebi:") %}
+                            <a href="https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI%3A{{db_id}}">ChEBI</a>&nbsp;&nbsp;
+                            {% elif ref.startswith("chembl:") %}
+                            <a href="https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL{{db_id}}">ChEMBL</a>&nbsp;&nbsp;
+                            {% elif ref.startswith("chemspider:") %}
+                            <a href="http://www.chemspider.com/Chemical-Structure.{{db_id}}.html">ChemSpider</a>&nbsp;&nbsp;
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
                 </tbody>
             </table>
         </div>
