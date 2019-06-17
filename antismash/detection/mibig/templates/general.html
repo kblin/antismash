@@ -29,15 +29,10 @@
                     </td>
                     <td>
                         Minimal annotation: {{"yes" if data["cluster"].get("minimal", False) else "no"}}
-                        <div class="help-container" style="float: none;">
-                            <div class="help-icon" data-id="mibig-help-general-minimal" style="float: none; background-color: #006CA2;"></div>
-                            <span class="help-tooltip" id="mibig-help-general-minimal">A minimal annotation only contain information on the BGC loci and one or more linked chemical product(s)</span>
-                        </div>
+                        {{help_tooltip("A minimal annotation only contains information on the BGC loci and one or more linked chemical product(s)", "mibig", inline=True)}}
                         <br />
                         Completeness: {{data["cluster"]["loci"]["completeness"]}}
-                        <div class="help-container" style="float: none;">
-                            <div class="help-icon" data-id="mibig-help-general-completeness" style="float: none; background-color: #006CA2;"></div>
-                            <span class="help-tooltip" id="mibig-help-general-completeness">Whether the loci encodes everything needed for the pathway producing the compound(s)</span>
+                        {{help_tooltip("Whether the loci encodes everything needed for the pathway producing the compound(s)", "mibig", inline=True)}}
                         </div>
                     </td>
                 </tr>

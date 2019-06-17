@@ -94,10 +94,7 @@
                                     [active]
                                     {% endif %}
                                     {% if "comments" in module %}
-                                    <div class="help-container" style="float: none;">
-                                        <div class="help-icon" data-id="mibig-help-nrp-nrps-module-{{loop.index}}" style="float: none; background-color: #006CA2;"></div>
-                                        <span class="help-tooltip" id="mibig-help-nrp-nrps-module-{{loop.index}}">{{module["comments"]}}</span>
-                                    </div>
+                                      {{help_tooltip(module["comments"], "mibig")}}
                                     {% endif %}
                                 </strong><br />
                                 {% if "a_substr_spec" in module %}

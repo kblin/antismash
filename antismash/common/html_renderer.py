@@ -100,13 +100,14 @@ def collapser_end() -> Markup:
 _TOOLTIP_COUNTER = 0
 
 
-def help_tooltip(text: str, name: str) -> Markup:
+def help_tooltip(text: str, name: str, inline: bool = False) -> Markup:
     """ Constructs a help icon with tooltip, each will have a unique ID generated
         based on the given name.
 
         Arguments:
             text: the content of the tooltip
             name: a prefix for id generation
+            inline: whether the tooltip icon should be placed inline
 
         Returns:
             A Markup instance with the constructed HTML
@@ -114,10 +115,10 @@ def help_tooltip(text: str, name: str) -> Markup:
     global _TOOLTIP_COUNTER  # pylint: disable=global-statement
     _TOOLTIP_COUNTER += 1
     unique_id = "%s-help-%d" % (name, _TOOLTIP_COUNTER)
-    return Markup(('<div class="help-container">'
+    return Markup(('<div class="help-container{2}">'
                    ' <div class="help-icon" data-id="{0}"></div>'
                    ' <span class="help-tooltip" id="{0}">{1}</span>'
-                   '</div>').format(unique_id, text))
+                   '</div>').format(unique_id, text, "-inline" if inline else ""))
 
 
 def docs_link(label: str, subtarget: str = "") -> Markup:
