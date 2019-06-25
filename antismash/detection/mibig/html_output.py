@@ -24,7 +24,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
     data = results.data
 
     html = HTMLSections("mibig-general")
-    html.add_detail_section("General", FileTemplate(path.get_full_path(__file__, "templates", "general.html")).render(data=results.data))
+    taxonomy_text = " > ".join(["{} ({})".format(taxobj["name"], taxobj["rank"]) for taxobj in data["cluster"]["taxonomy"]])
+    html.add_detail_section("General", FileTemplate(path.get_full_path(__file__, "templates", "general.html")).render(data=results.data, taxonomy_text=taxonomy_text))
 
     for compound in results.data["cluster"]["compounds"]:
         compound["keys"] = [key for key in compound.keys() if (key not in ["compound", "chem_struct"]) and (not isinstance(compound[key], list) or len(compound[key]) > 0)]

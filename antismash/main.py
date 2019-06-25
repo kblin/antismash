@@ -242,7 +242,7 @@ def run_mibig_detection(record: Record, options: ConfigType,
     logging.info("%d region(s) detected in record", len(record.get_regions()))
 
     # finally, run any detection limited to genes in regions
-    for module in [nrps_pks_domains, cluster_hmmer, genefunctions]:
+    for module in [cluster_hmmer, genefunctions]:#[nrps_pks_domains, cluster_hmmer, genefunctions]:
         run_module(record, cast(AntismashModule, module), options, module_results, timings)
         results = module_results.get(module.__name__)
         if results:

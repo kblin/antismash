@@ -20,7 +20,7 @@
                     <td>
                         {{data["cluster"]["compounds"][0]["compound"]}}
                         biosynthetic gene cluster from
-                        <i>{{data["cluster"]["loci"]["organism"]}}</i>
+                        <i>{{data["cluster"]["organism_name"]}}</i>
                     </td>
                 </tr>
                 <tr>
@@ -111,8 +111,8 @@
                         <strong>Species</strong>
                     </td>
                     <td>
-                        <i>{{data["cluster"]["loci"]["organism"]}}</i>
-                        [<a href="javascript: alert('{{'>'.join(data['cluster']['loci']['taxonomy'])}}');">taxonomy</a>]
+                        <i>{{data["cluster"]["organism_name"]}}</i>
+                        [<a href="javascript: alert('{{taxonomy_text}}');">taxonomy</a>]
                     </td>
                 </tr>
                 <tr>

@@ -33,6 +33,12 @@ def get_arguments() -> ModuleArgs:
                     type=str,
                     default="",
                     help=("Sideload MIBiG annotations from the JSON file in the given path."))
+    args.add_option("mibig-cache-json",
+                    dest="mibig_cache_json",
+                    metavar="JSON",
+                    type=str,
+                    default="",
+                    help=("Sideload cache JSON for MIBiG annotations."))
     return args
 
 
@@ -64,7 +70,7 @@ def run_on_record(record: Record, previous_results: Optional[MibigAnnotations],
     """
     if previous_results:
         return previous_results
-    return mibig_loader(options.mibig_json, record)
+    return mibig_loader(options.mibig_json, options.mibig_cache_json, record)
 
 
 def prepare_data(_logging_only: bool = False) -> List[str]:

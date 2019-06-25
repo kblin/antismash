@@ -18,7 +18,9 @@
                     </td>
                     <td>
                         <ul style="padding: 0; padding-left: 1em; margin: 0;">
-                            <li>{{log["comment"]}}</li>
+                            {% for comment in log["comments"] %}
+                            <li>{{comment}}</li>
+                            {% endfor %}
                         </ul>            
                     </td>
                 </tr>

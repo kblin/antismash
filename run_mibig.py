@@ -11,7 +11,8 @@ from subprocess import call
 def _main():
     json_path = argv[1]
     gbk_folder = argv[2]
-    output_folder = argv[3]
+    cache_folder = argv[3]
+    output_folder = argv[4]
     antismash_path = path.abspath(path.dirname(__file__))
 
     with open(json_path, "r") as json_file:
@@ -19,6 +20,7 @@ def _main():
         mibig_acc = data["cluster"]["mibig_accession"]
         gbk_acc = data["cluster"]["loci"]["accession"]
         gbk_path = path.join(gbk_folder, "{}.gbk".format(gbk_acc))
+        cache_json_path = path.join(cache_folder, "{}.cache.json".format(mibig_acc))
         output_path = path.join(output_folder, mibig_acc)
         commands = [
             "python",
@@ -27,6 +29,8 @@ def _main():
             "--mibig-mode",
             "--mibig-json",
             json_path,
+            "--mibig-cache-json",
+            cache_json_path,
             "--output-dir",
             output_path,
             gbk_path
@@ -34,7 +38,10 @@ def _main():
         print("Generating MIBiG output for {}".format(mibig_acc))
         if call(commands) == 0:
             print("Generating antiSMASH output for {}".format(mibig_acc))
-            if "Bacteria" in data["cluster"]["loci"]["taxonomy"]:
+            with open(cache_json_path) as handle:
+                cached = json.load(handle)
+            taxonomy = [tax_obj["name"] for tax_obj in cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]]
+            if "Bacteria" in taxonomy:
                 commands = [
                     "python",
                     path.join(antismash_path, "run_antismash.py"),
@@ -46,7 +53,7 @@ def _main():
                     path.join(output_path, "{}.region001.gbk".format(gbk_acc))
                 ]
                 call(commands)
-            elif "Fungi" in data["cluster"]["loci"]["taxonomy"]:
+            elif "Fungi" in taxonomy:
                 commands = [
                     "python",
                     path.join(antismash_path, "run_antismash.py"),
@@ -58,7 +65,7 @@ def _main():
                     path.join(output_path, "{}.region001.gbk".format(gbk_acc))
                 ]
                 call(commands)
-            elif "Viridiplantae" in data["cluster"]["loci"]["taxonomy"]:
+            elif "Viridiplantae" in taxonomy:
                 "Plant BGC is temporarily not supported"
             else:
                 "Taxon is not supported (yet)"

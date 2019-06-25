@@ -4,7 +4,13 @@
 """ MiBIG specific sideloading """
 
 import json
+from os import path
 from typing import Any, Dict, List
+import logging
+
+from Bio import Entrez
+from xml.dom import minidom
+import time
 
 from antismash.common.module_results import DetectionResults
 from antismash.common.secmet import CDSFeature, SubRegion, Record
@@ -24,9 +30,16 @@ class MibigAnnotations(DetectionResults):
         return {}
 
 
-def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
+def mibig_loader(annotations_file: str, cache_file: str, record: Record) -> MibigAnnotations:
     with open(annotations_file) as handle:
         annotations = json.load(handle)
+
+    # load/fetch cached information
+    cached = load_cached_information(annotations, cache_file)
+    save_cached_information(cached, cache_file)
+
+    # insert cached information into the annotation data
+    annotations["cluster"]["taxonomy"] = cached["taxonomy"][annotations["cluster"]["ncbi_tax_id"]]
 
     # set and append region
     product = ", ".join(annotations["cluster"]["biosyn_class"])
@@ -65,3 +78,59 @@ def mibig_loader(annotations_file: str, record: Record) -> MibigAnnotations:
                     cds_feature.product = annot["product"]
 
     return MibigAnnotations(record.id, area, annotations)
+
+
+def load_cached_information(annotations, cache_json_path):
+    """"""
+    if (path.exists(cache_json_path)):
+        with open(cache_json_path) as handle:
+            cached = json.load(handle)
+    else:
+        cached = {}
+
+    ncbi_email = "mibig@secondarymetabolites.org"
+
+    assert isinstance(cached, dict)
+
+    # fetch taxonomy information
+    if "taxonomy" not in cached:
+        cached["taxonomy"] = {}
+    ncbi_tax_id = annotations["cluster"]["ncbi_tax_id"]
+    if ncbi_tax_id not in cached["taxonomy"]:
+        cached["taxonomy"][ncbi_tax_id] = get_ncbi_taxonomy(ncbi_tax_id, ncbi_email)
+    
+    # fetch BibTex for publications
+    # ....
+
+    return cached
+
+
+def save_cached_information(cached, cache_json_path):
+    """"""
+    with open(cache_json_path, "w") as handle:
+        handle.write(json.dumps(cached, indent=4, separators=(',', ': '), sort_keys=True))
+
+    
+def get_ncbi_taxonomy(tax_id, email):
+    """fetch taxonomy information from ncbi_tax_id"""
+    taxonomy = []    
+    Entrez.email = email
+    num_try = 1
+    while num_try < 6:
+        try:
+            logging.debug("Fetching taxonomy information from NCBI for tax_id:{}...".format(tax_id))
+            dom = minidom.parse(Entrez.efetch(db="taxonomy", id=tax_id))
+            for dom_taxon in dom.getElementsByTagName('Taxon'):
+                taxid = dom_taxon.getElementsByTagName("TaxId")[0].firstChild.nodeValue
+                name = dom_taxon.getElementsByTagName("ScientificName")[0].firstChild.nodeValue
+                rank = dom_taxon.getElementsByTagName("Rank")[0].firstChild.nodeValue
+                taxonomy.append({"name": name, "taxid": taxid, "rank": rank})
+            break
+        except:
+            pass
+        num_try += 1
+        time.sleep(5)
+    if len(taxonomy) > 1: # shuffle species to the end of the list
+        taxonomy.append(taxonomy.pop(0))
+        
+    return taxonomy
