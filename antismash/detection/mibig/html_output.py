@@ -25,7 +25,19 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
 
     html = HTMLSections("mibig-general")
     taxonomy_text = " > ".join(["{} ({})".format(taxobj["name"], taxobj["rank"]) for taxobj in data["cluster"]["taxonomy"]])
-    html.add_detail_section("General", FileTemplate(path.get_full_path(__file__, "templates", "general.html")).render(data=results.data, taxonomy_text=taxonomy_text))
+    publications_links = []
+    for pub in data["cluster"]["publications"]:
+        [category, index] = pub.split(":")
+        if category == "pubmed":
+            url = "https://www.ncbi.nlm.nih.gov/pubmed/{}".format(index)
+        elif category == "patent":
+            url = "https://patents.google.com/patent/{}".format(index)
+        elif category == "doi":
+            url = "https://dx.doi.org/{}".format(index)
+        elif category == "url":
+            url = index
+        publications_links.append(url)
+    html.add_detail_section("General", FileTemplate(path.get_full_path(__file__, "templates", "general.html")).render(data=results.data, taxonomy_text=taxonomy_text, publications_links=publications_links))
 
     for compound in results.data["cluster"]["compounds"]:
         compound["keys"] = [key for key in compound.keys() if (key not in ["compound", "chem_struct"]) and (not isinstance(compound[key], list) or len(compound[key]) > 0)]

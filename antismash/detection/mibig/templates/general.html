@@ -121,9 +121,9 @@
                     </td>
                     <td>
                         <ul style="padding: 0; margin: 0; list-style: none;">
-                            {% for pub in data["cluster"]["publications"] %}
+                            {% for url in publications_links %}
                             <li>
-                                {{pub}} (todo: auto-generate citation)
+                                <a href="{{url}}">{{url}}</a>
                             </li>
                             {% endfor %}
                         </ul>
