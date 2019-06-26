@@ -14,6 +14,10 @@ def _main():
     gbk_folder = argv[2]
     cache_folder = argv[3]
     output_folder = argv[4]
+    if len(argv) > 5:
+        use_source = argv[5] == "1"
+    else:
+        use_source = False
     antismash_path = path.abspath(path.dirname(__file__))
 
     with open(json_path, "r") as json_file:
@@ -37,13 +41,15 @@ def _main():
             output_path,
             gbk_path
         ]
+        if not use_source:
+            commands = ["antismash"] + commands[2:]
         print("Generating MIBiG output for {}".format(mibig_acc))
         reuse_success = False
         if path.exists(reusable_json_path):
             reuse_success = call(commands[:-1] + ["--reuse-results", reusable_json_path]) == 0
-            if not reuse_success:
-                # remove output path, proceed with caution!
-                rmtree(output_path)
+        if not reuse_success:
+            # remove output path, proceed with caution!
+            rmtree(output_path)
                 
         if reuse_success or call(commands) == 0:
             print("Generating antiSMASH output for {}".format(mibig_acc))
@@ -62,6 +68,8 @@ def _main():
                     path.join(output_path, "generated"),
                     path.join(output_path, "{}.region001.gbk".format(gbk_acc))
                 ]
+                if not use_source:
+                    commands = ["antismash"] + commands[2:]
                 if path.exists(reusable_as5_json_path):
                     commands.pop(-1) # remove sequence path
                     commands.extend(["--reuse-results", reusable_as5_json_path]) # add reusable json path
@@ -77,6 +85,8 @@ def _main():
                     path.join(output_path, "generated"),
                     path.join(output_path, "{}.region001.gbk".format(gbk_acc))
                 ]
+                if not use_source:
+                    commands = ["antismash"] + commands[2:]
                 if path.exists(reusable_as5_json_path):
                     commands.pop(-1) # remove sequence path
                     commands.extend(["--reuse-results", reusable_as5_json_path]) # add reusable json path
