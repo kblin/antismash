@@ -22,9 +22,10 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
                   record_layer: RecordLayer, _options_layer: OptionsLayer) -> HTMLSections:
     assert isinstance(results, MibigAnnotations)
     data = results.data
+    taxonomy = results.taxonomy
 
     html = HTMLSections("mibig-general")
-    taxonomy_text = " > ".join(["{} ({})".format(taxobj["name"], taxobj["rank"]) for taxobj in data["cluster"]["taxonomy"]])
+    taxonomy_text = " > ".join(["{} ({})".format(taxobj["name"], taxobj["rank"]) for taxobj in taxonomy])
     publications_links = []
     for pub in data["cluster"]["publications"]:
         [category, index] = pub.split(":")

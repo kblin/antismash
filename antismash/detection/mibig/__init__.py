@@ -61,7 +61,7 @@ def is_enabled(options: ConfigType) -> bool:
 def regenerate_previous_results(results: Dict[str, Any], record: Record,
                                 options: ConfigType) -> Optional[MibigAnnotations]:
     """ Regenerate previous results. """
-    return None # unimplemented
+    return MibigAnnotations.from_json(results, record, options.mibig_json, options.mibig_cache_json)
 
 
 def run_on_record(record: Record, previous_results: Optional[MibigAnnotations],
