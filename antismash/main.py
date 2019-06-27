@@ -217,7 +217,7 @@ def run_mibig_detection(record: Record, options: ConfigType,
     """
     timings = {}  # type: Dict[str, float]
 
-    logging.info("Loading MiBIG annotations")
+    logging.info("Loading MIBiG annotations")
     run_module(record, cast(AntismashModule, mibig), options, module_results, timings)
     results = module_results.get(mibig.__name__)
     if not results:
@@ -725,7 +725,8 @@ def _run_antismash(sequence_file: Optional[str], options: ConfigType) -> int:
 
     prepare_output_directory(options.output_dir, sequence_file or options.reuse_results)
 
-    results.records = record_processing.pre_process_sequences(results.records, options,
+    if not options.mibig_mode:
+        results.records = record_processing.pre_process_sequences(results.records, options,
                                                               cast(AntismashModule, genefinding))
     for record, module_results in zip(results.records, results.results):
         # skip if we're not interested in it
