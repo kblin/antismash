@@ -47,10 +47,9 @@ def _main():
         reuse_success = False
         if path.exists(reusable_json_path):
             reuse_success = call(commands[:-1] + ["--reuse-results", reusable_json_path]) == 0
-        if not reuse_success:
+        if path.exists(output_path) and not reuse_success:
             # remove output path, proceed with caution!
             rmtree(output_path)
-                
         if reuse_success or call(commands) == 0:
             print("Generating antiSMASH output for {}".format(mibig_acc))
             with open(cache_json_path) as handle:
