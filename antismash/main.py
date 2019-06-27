@@ -725,13 +725,8 @@ def _run_antismash(sequence_file: Optional[str], options: ConfigType) -> int:
 
     prepare_output_directory(options.output_dir, sequence_file or options.reuse_results)
 
-    if not options.mibig_mode:
-        results.records = record_processing.pre_process_sequences(results.records, options,
+    results.records = record_processing.pre_process_sequences(results.records, options,
                                                               cast(AntismashModule, genefinding))
-    else:
-        for i, seq in enumerate(results.records):
-            seq.record_index = i + 1  # 1-indexed
-
 
     for record, module_results in zip(results.records, results.results):
         # skip if we're not interested in it

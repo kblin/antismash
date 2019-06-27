@@ -19,13 +19,12 @@ def _main():
     gbk_folder = argv[2]
     cache_folder = argv[3]
     output_folder = argv[4]
-    if len(argv) > 5:
-        use_source = argv[5] == "1"
+    log_file_path = argv[5]
+    if len(argv) > 6:
+        use_source = argv[6] == "1"
     else:
         use_source = False
     antismash_path = path.abspath(path.dirname(__file__))
-
-    log_file_path = path.join(output_folder, "log-{}".format(datetime.now().strftime('%Y-%m-%d-%H.%M.%S')))
 
     with open(json_path, "r") as json_file:
         data = json.load(json_file)

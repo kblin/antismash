@@ -234,6 +234,8 @@ def ensure_cds_info(genefinding: Callable[[Record, Any], None], sequence: Record
     if sequence.skip:
         return sequence
     if not sequence.get_cds_features():
+        if options.mibig_mode:
+            return sequence
         if not options.genefinding_gff3 and options.genefinding_tool != "none":
             logging.info("No CDS features found in record %r, running gene finding.", sequence.id)
             genefinding(sequence, options)
