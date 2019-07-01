@@ -9,9 +9,11 @@
         {% if annotation.get('tailoring') %}
           ({{", ".join(annotation['tailoring'])}})
         {% endif %}
+        (evidence:
         {% for evidence in function['evidence'] %}
           <span class='mibig-gf-evidence-{{evidence[0]}}' title='{{evidence}}'>{{evidence[0]}}</span>
         {% endfor %}
+        )
       {% endfor %}
     {% else %}
       -

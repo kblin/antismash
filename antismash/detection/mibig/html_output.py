@@ -82,8 +82,10 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
                     function_text += " ({}) ".format(", ".join(annot['tailoring']))
                 else:
                     function_text += " "
+                function_text += "(evidence: "
                 for evidence in function['evidence']:
                     function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
+                function_text += ")"
                 gene["functions"].append(function_text)
             if "mut_pheno" in gene:
                 function_text = "Mutation phenotype: {}".format(gene["mut_pheno"])
