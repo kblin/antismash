@@ -6,9 +6,10 @@
 import json
 import string
 import os
+import re
 from typing import Any, Dict, List, Tuple, Union, cast
 
-from antismash.common import path, module_results
+from antismash.common import html_renderer, path, module_results
 from antismash.common.html_renderer import FileTemplate, HTMLSections
 from antismash.common.json import JSONOrf
 from antismash.common.layers import RecordLayer, OptionsLayer
@@ -47,6 +48,10 @@ def build_json_data(records: List[Record], results: List[Dict[str, module_result
 
     for i, record in enumerate(records):
         json_record = js_records[i]
+        # replace antismash cds_detail with mibig's one
+        cds_annotations = results[i]["antismash.detection.mibig"].data["cluster"]["genes"]["annotations"]
+        update_cds_description(json_record, cds_annotations)
+
         json_record['seq_id'] = "".join(char for char in json_record['seq_id'] if char in string.printable)
         for region, json_region in zip(record.get_regions(), json_record['regions']):
             handlers = find_plugins_for_cluster(get_all_modules(), json_region)
@@ -148,3 +153,34 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
                               svg_tooltip=svg_tooltip,
                               annotation_filename=annotation_filename)
         result_file.write(aux)
+
+
+def update_cds_description(js_record, annotations):
+    id_to_annotations = {}
+    template = html_renderer.FileTemplate(path.get_full_path(__file__, "templates", "cds_detail.html"))
+    for annotation in annotations:
+        if annotation["id"]:
+            id_to_annotations[annotation["id"]] = annotation
+        if annotation["name"]:
+            id_to_annotations[annotation["name"]] = annotation
+    for reg_idx, js_region in enumerate(js_record["regions"]):
+        for cds_idx, js_cds in enumerate(js_region["orfs"]):
+            desc_html = js_cds["description"]
+            re_locus = re.search("Locus tag: (.+)<br>", desc_html)
+            locus_tag = re_locus.group(1)
+            if locus_tag in id_to_annotations:
+                annotation = id_to_annotations[locus_tag]
+            else:
+                re_protid = re.search("Protein ID: (.+)<br>", desc_html)
+                protein_id = re_protid.group(1)
+                if protein_id in id_to_annotations:
+                    annotation = id_to_annotations[protein_id]
+                else:
+                    re_gid = re.search("Gene: (.+)<br>", desc_html)
+                    gene_id = re_gid.group(1)
+                    if gene_id in id_to_annotations:
+                        annotation = id_to_annotations[gene_id]
+                    else:
+                        annotation = None
+            additional_annots = "<br>added<br>"
+            js_cds["description"] = re.sub("(\(total: (.+) nt\)<br>)", r"\1{}".format(template.render(annotation=annotation)), str(js_cds["description"]))

@@ -62,6 +62,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
         gene["functions"] = []
         for function in cds_feature.gene_functions:
             function_text = str(function.function)
+            if function.tool != "mibig":
+                continue
             if function.tool == "rule-based-clusters":
                 function_text += " ({})".format(function.description)
             elif function.tool == "smcogs":
