@@ -69,7 +69,7 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
             gene["functions"].append(function_text)
         annot_idx = -1
         for i, annot in enumerate(annots):
-            if annot["id"] == cds_feature.locus_tag or annot["id"] == cds_feature.protein_id or annot["name"] == cds_feature.gene:
+            if annot["id"] == cds_feature.locus_tag or annot["id"] == cds_feature.protein_id or annot.get("name", None) == cds_feature.gene:
                 annot_idx = i
                 break
         if annot_idx >= 0:
