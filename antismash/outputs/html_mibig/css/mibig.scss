@@ -40,6 +40,10 @@ $antismash-light: #0078B8;
     grid-column: 1 e("/") 3;  // removes sidepanel details section
 }
 
+.body-details-section {
+    font-size: 0.8em; // make fonts in detail panels smaller
+}
+
 nav {
     height: 60px;  // account for taller mibig icon
 }
