@@ -123,12 +123,12 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
                 record_layers_without_regions.append(RecordLayer(record, None, options_layer))
             results_by_record_id[record.id] = record_results
 
-        page_title = "the MIBiG Repository"
-
         regions_written = sum(len(record.get_regions()) for record in records)
         job_id = os.path.basename(options.output_dir)
 
-        annotation_filename = "{}.json".format(os.path.splitext(os.path.basename(options.mibig_json))[0])
+        mibig_id = os.path.splitext(os.path.basename(options.mibig_json))[0]
+        annotation_filename = "{}.json".format(mibig_id)
+        page_title = mibig_id
 
         html_sections = generate_html_sections(record_layers_with_regions, results_by_record_id, options)
 
