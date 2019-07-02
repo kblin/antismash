@@ -49,7 +49,10 @@ def build_json_data(records: List[Record], results: List[Dict[str, module_result
     for i, record in enumerate(records):
         json_record = js_records[i]
         # replace antismash cds_detail with mibig's one
-        cds_annotations = results[i]["antismash.detection.mibig"].data["cluster"]["genes"]["annotations"]
+        try:
+            cds_annotations = results[i]["antismash.detection.mibig"].data["cluster"]["genes"]["annotations"]
+        except:
+            cds_annotations = []
         update_cds_description(json_record, cds_annotations)
 
         json_record['seq_id'] = "".join(char for char in json_record['seq_id'] if char in string.printable)
