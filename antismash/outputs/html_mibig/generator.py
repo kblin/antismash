@@ -162,9 +162,9 @@ def update_cds_description(js_record, annotations):
     id_to_annotations = {}
     template = html_renderer.FileTemplate(path.get_full_path(__file__, "templates", "cds_detail.html"))
     for annotation in annotations:
-        if annotation["id"]:
+        if "id" in annotation and annotation["id"]:
             id_to_annotations[annotation["id"]] = annotation
-        if annotation["name"]:
+        if "name" in annotation and annotation["name"]:
             id_to_annotations[annotation["name"]] = annotation
     for reg_idx, js_region in enumerate(js_record["regions"]):
         for cds_idx, js_cds in enumerate(js_region["orfs"]):
