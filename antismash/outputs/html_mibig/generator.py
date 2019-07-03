@@ -51,7 +51,7 @@ def build_json_data(records: List[Record], results: List[Dict[str, module_result
         # replace antismash cds_detail with mibig's one
         try:
             cds_annotations = results[i]["antismash.detection.mibig"].data["cluster"]["genes"]["annotations"]
-        except:
+        except KeyError:
             cds_annotations = []
         update_cds_description(json_record, cds_annotations)
 

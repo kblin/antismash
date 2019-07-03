@@ -17,6 +17,7 @@ from antismash.common.module_results import DetectionResults
 from antismash.common.secmet import CDSFeature, SubRegion, Record
 from antismash.common.secmet.locations import FeatureLocation, CompoundLocation
 
+from urllib.error import HTTPError
 
 class MibigAnnotations(DetectionResults):
     def __init__(self, record_id: str, area: SubRegion, data: Dict[str, Any], cache_file: str) -> None:
@@ -177,7 +178,8 @@ def get_ncbi_taxonomy(tax_id, email):
                 rank = dom_taxon.getElementsByTagName("Rank")[0].firstChild.nodeValue
                 taxonomy.append({"name": name, "taxid": taxid, "rank": rank})
             break
-        except:
+        except HTTPError:
+            logging.error("Failed to query NCBI taxonomy database, retrying...")
             pass
         num_try += 1
         time.sleep(5)
