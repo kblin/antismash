@@ -5,7 +5,7 @@
 
 import json
 from os import path
-from sys import argv
+from sys import argv, exit
 from subprocess import call
 from shutil import rmtree
 from datetime import datetime
@@ -67,6 +67,7 @@ def _main():
             write_log("Removed {}".format(output_path), log_file_path)
         if not reuse_success and call(commands) == 1:
             write_log("Failed to generate MIBiG page for {}".format(mibig_acc), log_file_path)
+            exit(1)
         else:
             write_log("Successfully generated MIBiG page for {}".format(mibig_acc), log_file_path)
             print("Generating antiSMASH output for {}".format(mibig_acc))
@@ -96,6 +97,7 @@ def _main():
                     write_log("Successfully generated antiSMASH5 page for {}".format(mibig_acc), log_file_path)
                 else:
                     write_log("Failed to generate antiSMASH5 page for {}".format(mibig_acc), log_file_path)
+                    exit(1)
             elif "Fungi" in taxonomy:
                 commands = [
                     "python",
@@ -118,12 +120,14 @@ def _main():
                     write_log("Successfully generated antiSMASH5 page for {}".format(mibig_acc), log_file_path)
                 else:
                     write_log("Failed to generate antiSMASH5 page for {}".format(mibig_acc), log_file_path)
+                    exit(1)
             elif "Viridiplantae" in taxonomy:
                 "Plant BGC is temporarily not supported"
                 write_log("Plant BGCs {}".format(mibig_acc), log_file_path)
             else:
                 "Taxon is not supported (yet)"
                 write_log("Unrecognizable taxons {} ({})".format(mibig_acc, ":".join(taxonomy)), log_file_path)
+                exit(1)
 
 if __name__ == "__main__":
     _main()
