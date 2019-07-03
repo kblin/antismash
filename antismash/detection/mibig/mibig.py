@@ -24,7 +24,7 @@ class MibigAnnotations(DetectionResults):
         self.data = data # holds the original annotation json data
         # save calculated loci (relative to record), not annotated ones
         loci = data["cluster"]["loci"]
-        assert loci["accession"] == record_id
+        assert (loci["accession"] == record_id) or (loci["accession"].split("MIBIG:")[-1] == record_id)
         self.area = area
         # fetch/update cached information (for taxonomy, etc.)
         cached = load_cached_information(data, cache_file)
