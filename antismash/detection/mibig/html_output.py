@@ -28,7 +28,7 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
     taxonomy_text = " > ".join(["{} ({})".format(taxobj["name"], taxobj["rank"]) for taxobj in taxonomy])
     publications_links = []
     for pub in data["cluster"]["publications"]:
-        [category, index] = pub.split(":")
+        [category, index] = pub.split(":", 1)
         if category == "pubmed":
             url = "https://www.ncbi.nlm.nih.gov/pubmed/{}".format(index)
         elif category == "patent":
