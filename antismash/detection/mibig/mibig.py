@@ -18,12 +18,14 @@ from antismash.common.secmet import CDSFeature, SubRegion, Record
 from antismash.common.secmet.locations import FeatureLocation, CompoundLocation
 
 from urllib.error import HTTPError
+from antismash.common.errors import AntismashInputError
 
 class MibigAnnotations(DetectionResults):
     def __init__(self, record_id: str, area: SubRegion, data: Dict[str, Any], cache_file: str) -> None:
         super().__init__(record_id)
         self.data = data # holds the original annotation json data
         # save calculated loci (relative to record), not annotated ones
+        self.record_id = record_id
         loci = data["cluster"]["loci"]
         self.area = area
         # fetch/update cached information (for taxonomy, etc.)
@@ -38,7 +40,8 @@ class MibigAnnotations(DetectionResults):
         # save only information critical for deciding reusability
         loci = self.data["cluster"]["loci"]
         return {
-            "record_id": loci["accession"],
+            "record_id": self.record_id,
+            "genbank_accession": loci["accession"],
             "coords": (loci.get("start_coord", -1), loci.get("end_coord", -1)),
             "gene_annotations": self.data["cluster"].get("genes", {}).get("annotations", []),
             "extra_genes": self.data["cluster"].get("genes", {}).get("extra_genes", [])
@@ -54,7 +57,10 @@ class MibigAnnotations(DetectionResults):
         loci = data["cluster"]["loci"]
         gene_annotations = data["cluster"].get("genes", {}).get("annotations", [])
         extra_genes = data["cluster"].get("genes", {}).get("extra_genes", [])
-        if loci["accession"] != prev["record_id"]:
+        if loci["accession"] != prev["genbank_accession"]:
+            logging.debug("Previous result's genbank_accession is not the same as the new one")
+            can_reuse = False
+        elif record.id != prev["record_id"]:
             logging.debug("Previous result's record_id is not the same as the new one")
             can_reuse = False
         elif loci.get("start_coord", -1) != prev["coords"][0] or loci.get("end_coord", -1) != prev["coords"][1]:
@@ -80,7 +86,7 @@ class MibigAnnotations(DetectionResults):
             return MibigAnnotations(record.id, area, data, cache_file)
         else:
             logging.error("Can't reuse MIBiG annotation, please turn off --reuse-results. Exiting..")
-            sys.exit(1)
+            raise AntismashInputError("Genbank record or gene annotations are updated, can't reuse result")
 
 
 def mibig_loader(annotations_file: str, cache_file: str, record: Record) -> MibigAnnotations:

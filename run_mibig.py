@@ -31,10 +31,8 @@ def _main():
         mibig_acc = data["cluster"]["mibig_accession"]
         gbk_acc = data["cluster"]["loci"]["accession"]
         if gbk_acc.startswith("MIBIG:"):
-            gbk_acc = gbk_acc.split("MIBIG:")[-1]
-            gbk_path = path.join(gbk_folder, "{}.final.gbk".format(gbk_acc))
-        else:
-            gbk_path = path.join(gbk_folder, "{}.gbk".format(gbk_acc))
+            gbk_acc = "{}.final".format(gbk_acc.split("MIBIG:")[-1])
+        gbk_path = path.join(gbk_folder, "{}.gbk".format(gbk_acc))
         cache_json_path = path.join(cache_folder, "{}.cache.json".format(mibig_acc))
         output_path = path.join(output_folder, mibig_acc)
         reusable_json_path = path.join(output_path, "{}.json".format(gbk_acc))
@@ -72,9 +70,14 @@ def _main():
             write_log("Successfully generated MIBiG page for {}".format(mibig_acc), log_file_path)
             print("Generating antiSMASH output for {}".format(mibig_acc))
             with open(cache_json_path) as handle:
-                cached = json.load(handle   )
+                cached = json.load(handle)
             taxonomy = [tax_obj["name"] for tax_obj in cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]]
-            reusable_as5_json_path = path.join(output_path, "generated", "{}.region001.json".format(gbk_acc))
+            with open(path.join(output_path, "{}.json".format(gbk_acc)), "r") as result_json_txt:
+                result_json = json.load(result_json_txt)
+                assert len(result_json["records"]) == 1 and "antismash.detection.mibig" in result_json["records"][0]["modules"]
+                region_acc = "{}.region001".format(result_json["records"][0]["modules"]["antismash.detection.mibig"]["record_id"])
+            reusable_as5_json_path = path.join(output_path, "generated", "{}.json".format(region_acc))
+            region_gbk_path = path.join(output_path, "{}.gbk".format(region_acc))
             if "Bacteria" in taxonomy:
                 commands = [
                     "python",
@@ -86,7 +89,7 @@ def _main():
                     "bacteria",
                     "--output-dir",
                     path.join(output_path, "generated"),
-                    path.join(output_path, "{}.region001.gbk".format(gbk_acc))
+                    region_gbk_path
                 ]
                 if not use_source:
                     commands = ["antismash"] + commands[2:]
@@ -109,7 +112,7 @@ def _main():
                     "fungi",
                     "--output-dir",
                     path.join(output_path, "generated"),
-                    path.join(output_path, "{}.region001.gbk".format(gbk_acc))
+                    region_gbk_path
                 ]
                 if not use_source:
                     commands = ["antismash"] + commands[2:]
