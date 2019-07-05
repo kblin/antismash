@@ -30,8 +30,6 @@ def _main():
         data = json.load(json_file)
         mibig_acc = data["cluster"]["mibig_accession"]
         gbk_acc = data["cluster"]["loci"]["accession"]
-        if gbk_acc.startswith("MIBIG:"):
-            gbk_acc = "{}.final".format(gbk_acc.split("MIBIG:")[-1])
         gbk_path = path.join(gbk_folder, "{}.gbk".format(gbk_acc))
         cache_json_path = path.join(cache_folder, "{}.cache.json".format(mibig_acc))
         output_path = path.join(output_folder, mibig_acc)
