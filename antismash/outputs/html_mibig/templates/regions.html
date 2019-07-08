@@ -27,7 +27,10 @@
         {% else %}
           {% set startend="" %}
         {% endif %}
-        This entry is originated from NCBI GenBank <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data["cluster"]["loci"]["accession"]}}</a>.
+        This entry is originally from NCBI GenBank <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data["cluster"]["loci"]["accession"]}}</a>
+        {%- if record.get_alterations() -%}
+            , but <span class="modification-warning">has been modified</span> (see Modifications tab for details)
+        {%- endif %}.
         {% endif %}
       </div>
       <div class="region-svg-container">
@@ -74,6 +77,9 @@
       </div>
      {% endfor %}
     {% endfor %}
+    {% if record.get_alterations() %}
+      <div class="body-details-header {{region.anchor_id}}-modifications" data-name="{{region.anchor_id}}-modifications">Modifications</div>
+    {% endif %}
     </div>
     {% for module_sections in all_module_sections %}
      {% for section in module_sections.detail_sections %}
@@ -82,6 +88,18 @@
     </div>
      {% endfor %}
     {% endfor %}
+     {% if record.get_alterations() %}
+     <div class="body-details-section {{region.anchor_id}}-modifications">
+      <div class="details">
+       <div class="heading"><span>Modifications to original record</span></div>
+       <ul>
+       {%- for alteration in record.get_alterations() %}
+          <li>{{alteration}}</li>
+       {% endfor -%}
+       </ul>
+      </div>
+     </div>
+     {%- endif -%}
   </div>
 
  </div>
