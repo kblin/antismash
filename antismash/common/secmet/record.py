@@ -625,7 +625,7 @@ class Record:
                 original_name = cds.get_name()
                 if original_name not in self._deduplicated_cds_names:
                     self._deduplicated_cds_names[original_name] = []
-                new_name = "%s_rename%d" % (original_name, len(self._deduplicated_cds_names) + 1)
+                new_name = "%s_rename%d" % (original_name, len(self._deduplicated_cds_names[original_name]) + 1)
                 self._deduplicated_cds_names[original_name].append(new_name)
                 if cds.locus_tag:
                     cds.locus_tag = new_name
