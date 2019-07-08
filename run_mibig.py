@@ -9,6 +9,7 @@ from sys import argv, exit
 from subprocess import call
 from shutil import rmtree
 from datetime import datetime
+from antismash.detection.mibig.mibig import load_cached_information
 
 def write_log(text, file_path):
     with open(file_path, "a") as o:
@@ -34,10 +35,27 @@ def _main():
         cache_json_path = path.join(cache_folder, "{}.cache.json".format(mibig_acc))
         output_path = path.join(output_folder, mibig_acc)
         reusable_json_path = path.join(output_path, "{}.json".format(gbk_acc))
+
+        # load/populate cache in advance, because it is needed to fetch taxonomy information
+        cached = load_cached_information(data, cache_json_path, True)
+        taxonomy = [tax_obj["name"] for tax_obj in cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]]
+
+        if "Bacteria" in taxonomy:
+            taxon = "bacteria"
+        elif "Fungi" in taxonomy:
+            taxon = "fungi"
+        elif "Viridiplantae":
+            taxon = "plants"
+        else:
+            write_log("Unrecognizable taxons {} ({})".format(mibig_acc, ":".join(taxonomy)), log_file_path)
+            exit(1)
+
         commands = [
             "python",
             path.join(antismash_path, "run_antismash.py"),
             "-v",
+            "--taxon",
+            taxon,
             "--mibig-mode",
             "--mibig-json",
             json_path,
@@ -67,16 +85,13 @@ def _main():
         else:
             write_log("Successfully generated MIBiG page for {}".format(mibig_acc), log_file_path)
             print("Generating antiSMASH output for {}".format(mibig_acc))
-            with open(cache_json_path) as handle:
-                cached = json.load(handle)
-            taxonomy = [tax_obj["name"] for tax_obj in cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]]
             with open(path.join(output_path, "{}.json".format(gbk_acc)), "r") as result_json_txt:
                 result_json = json.load(result_json_txt)
                 assert len(result_json["records"]) == 1 and "antismash.detection.mibig" in result_json["records"][0]["modules"]
                 region_acc = "{}.region001".format(result_json["records"][0]["modules"]["antismash.detection.mibig"]["record_id"])
             reusable_as5_json_path = path.join(output_path, "generated", "{}.json".format(region_acc))
             region_gbk_path = path.join(output_path, "{}.gbk".format(region_acc))
-            if "Bacteria" in taxonomy:
+            if taxon in ["bacteria", "fungi"]:
                 commands = [
                     "python",
                     path.join(antismash_path, "run_antismash.py"),
@@ -84,7 +99,7 @@ def _main():
                     "--html-title",
                     "{} (generated)".format(mibig_acc),
                     "--taxon",
-                    "bacteria",
+                    taxon,
                     "--output-dir",
                     path.join(output_path, "generated"),
                     region_gbk_path
@@ -99,36 +114,9 @@ def _main():
                 else:
                     write_log("Failed to generate antiSMASH5 page for {}".format(mibig_acc), log_file_path)
                     exit(1)
-            elif "Fungi" in taxonomy:
-                commands = [
-                    "python",
-                    path.join(antismash_path, "run_antismash.py"),
-                    "-v",
-                    "--html-title",
-                    "{} (generated)".format(mibig_acc),
-                    "--taxon",
-                    "fungi",
-                    "--output-dir",
-                    path.join(output_path, "generated"),
-                    region_gbk_path
-                ]
-                if not use_source:
-                    commands = ["antismash"] + commands[2:]
-                reuse_as5_success = False
-                if path.exists(reusable_as5_json_path):
-                    reuse_as5_success = call(commands[:-1] + ["--reuse-results", reusable_as5_json_path]) == 0
-                if reuse_as5_success or call(commands) == 0:
-                    write_log("Successfully generated antiSMASH5 page for {}".format(mibig_acc), log_file_path)
-                else:
-                    write_log("Failed to generate antiSMASH5 page for {}".format(mibig_acc), log_file_path)
-                    exit(1)
-            elif "Viridiplantae" in taxonomy:
+            elif taxon == "plants":
                 "Plant BGC is temporarily not supported"
                 write_log("Plant BGCs {}".format(mibig_acc), log_file_path)
-            else:
-                "Taxon is not supported (yet)"
-                write_log("Unrecognizable taxons {} ({})".format(mibig_acc, ":".join(taxonomy)), log_file_path)
-                exit(1)
 
 if __name__ == "__main__":
     _main()

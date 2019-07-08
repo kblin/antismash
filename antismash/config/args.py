@@ -480,7 +480,7 @@ def basic_options() -> ModuleArgs:
     group.add_option('--taxon',
                      dest='taxon',
                      default='bacteria',
-                     choices=['bacteria', 'fungi'],
+                     choices=['bacteria', 'fungi', 'plants'],
                      type=str,
                      help="Taxonomic classification of input sequence. (default: %(default)s)")
     return group
