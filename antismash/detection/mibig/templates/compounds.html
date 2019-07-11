@@ -51,7 +51,9 @@
                         <td style="vertical-align: text-top;">
                             {% for ref in compound["database_id"] %}
                             {% set db_id = ref.split(':')[1] %}
-                            {% if ref.startswith("pubchem:") %}
+                            {% if ref.startswith("npatlas:") %}
+                            <a href="https://www.npatlas.org/joomla/index.php/explore/compounds#npaid=NPA{{'%06d' % db_id|int}}.html">NPAtlas</a>&nbsp;&nbsp;
+                            {% elif ref.startswith("pubchem:") %}
                             <a href="https://pubchem.ncbi.nlm.nih.gov/compound/{{db_id}}">PubCHEM</a>&nbsp;&nbsp;
                             {% elif ref.startswith("chebi:") %}
                             <a href="https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI%3A{{db_id}}">ChEBI</a>&nbsp;&nbsp;
