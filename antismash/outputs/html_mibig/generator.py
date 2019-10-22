@@ -154,7 +154,7 @@ def generate_webpage(records: List[Record], results: List[Dict[str, module_resul
                               config=options, job_id=job_id, page_title=page_title,
                               records_without_regions=record_layers_without_regions,
                               svg_tooltip=svg_tooltip,
-                              annotation_filename=annotation_filename)
+                              annotation_filename=annotation_filename, mibig_id=mibig_id)
         result_file.write(aux)
 
 
