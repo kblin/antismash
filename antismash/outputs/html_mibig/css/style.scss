@@ -9,8 +9,8 @@ $gene-type-biosynthetic: #810e15;
 $gene-type-biosynthetic-additional: #f16d75;
 $gene-type-regulatory: seagreen;
 $gene-type-transport: cornflowerblue;
-$gene-type-resistance: #ed90ed;
-$feature-tta-codon: magenta;
+$feature-resistance: #bbb;
+$feature-tta-codon: #444;
 $table-background: #f1f1f1;
 $tool-cassis: wheat;
 $tool-clusterfinder: teal;
@@ -21,6 +21,10 @@ $tool-rule-based-clusters: white;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.serif {
+    font-family: "Courier New", serif;
 }
 
 body {
@@ -546,9 +550,8 @@ table.region-table {
     fill: $gene-type-regulatory;
     stroke: black;
 }
-.svgene-type-resistance {
-    fill: $gene-type-resistance;
-    stroke: black;
+.svgene-resistance {
+    fill: $feature-resistance;
 }
 .svgene-tta-codon {
     fill: $feature-tta-codon;
@@ -558,9 +561,10 @@ table.region-table {
     stroke: #888;
 }
 .svgene-locustag {
+    @extend .serif;
     fill: $antismash-main;
     display: none;
-    font-size: 80%;
+    font-size: 85%;
 }
 
 .cluster-core {
@@ -666,9 +670,6 @@ table.region-table {
 .legend-type-regulatory {
     background-color: $gene-type-regulatory;
 }
-.legend-type-resistance {
-    background-color: $gene-type-resistance;
-}
 
 .legend-border-cassis {
     background-color: $tool-cassis;
@@ -681,6 +682,9 @@ table.region-table {
 .legend-tta-codon {
     background-color: $feature-tta-codon;
 }
+.legend-resistance {
+    background-color: $feature-resistance;
+}
 
 .legend {
     h4 {
@@ -690,11 +694,15 @@ table.region-table {
     @include left-padding;
 }
 
-.legend-field {
+.legend-symbol {
     float: left;
     width: 1em;
     height: 1em;
     margin-right: 0.25em;
+}
+
+.legend-field {
+    @extend .legend-symbol;
     border: 1px solid black;
 }
 
@@ -731,6 +739,7 @@ table.region-table {
 
 .details-svg {
     margin: 0 2%;
+    margin-top: 2px;
 }
 
 .jsdomain-line {
@@ -738,6 +747,8 @@ table.region-table {
     stroke: #888;
 }
 .jsdomain-orflabel {
+    @extend .serif;
+    font-size: 75%;
     fill: #444;
 }
 .jsdomain-tooltip {
@@ -747,8 +758,91 @@ table.region-table {
 .jsdomain-text {
     pointer-events: none;
 }
+.jsdomain-module {
+    fill: rgba(200, 200, 200, 0.5);
+    stroke-width: 1px;
+    stroke: #000;
+}
+.jsdomain-incomplete-module {
+    stroke-dasharray: 4 4;
+}
+
+.jsdomain-module-lid {
+    opacity: 1;
+    transition: opacity 1s;
+    &:hover {
+        opacity: 0;
+        transition: opacity 0s;
+    }
+    .jsdomain-module-lid-body {
+        filter: url(#inset-shadow);
+        stroke-width: 0px;
+        fill: rgb(240, 240, 240);
+    }
+    text {
+        @extend .jsdomain-text;
+    }
+}
+.jsdomain-svg {
+    margin-bottom: -5px;
+}
+.jsdomain-svg-single {
+    margin-bottom: -3px;
+}
+.jsdomain-adenylation {
+    stroke: rgb(87,22,128);
+    fill: rgb(188,127,245);
+}
+.jsdomain-transport {
+    stroke: rgb(11,78,199);
+    fill: rgb(129,190,247);
+}
+.jsdomain-condensation {
+    stroke: rgb(59,59,140);
+    fill: rgb(129,129,247);
+}
+.jsdomain-epimerase {
+    @extend .jsdomain-condensation;
+}
+.jsdomain-docking {
+    stroke: rgb(71,71,159);
+    fill: rgb(128,128,245);
+}
+.jsdomain-terminal {
+    stroke: rgb(119,3,116);
+    fill: rgb(245,196,242);
+}
+.jsdomain-ketosynthase {
+    stroke: rgb(9,179,9);
+    fill: rgb(129,247,129);
+}
+.jsdomain-acyltransferase {
+    stroke: rgb(221,6,6);
+    fill: rgb(247,129,129);
+}
+.jsdomain-mod-kr {
+    stroke: rgb(10,160,76);
+    fill: rgb(128,246,128);
+}
+.jsdomain-mod-dh {
+    stroke: rgb(186,103,15);
+    fill: rgb(247,190,129);
+}
+.jsdomain-mod-er {
+    stroke: rgb(12,161,137);
+    fill: rgb(129,247,243);
+}
+.jsdomain-mod-kr {
+    stroke: rgb(10,160,76);
+    fill: rgb(128,246,128);
+}
+.jsdomain-other {
+    stroke: rgb(147,147,147);
+    fill: rgb(218,218,218);
+}
 
 .clusterblast-locustag {
+    @extend .serif;
     fill: $antismash-main;
     display: none;
     font-size: 80%;
@@ -920,6 +1014,10 @@ ul.dropdown-options {
         margin-right: 0.1em;
         padding-left: 0.5em;
         padding-right: 0.5em;
+
+        /* solve edge single pixel gap */
+        padding-bottom: 1px;
+        margin-bottom: -1px;
 
         border-top-left-radius: 1em;
         border-top-right-radius: 1em;
