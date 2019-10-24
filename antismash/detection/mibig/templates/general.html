@@ -105,15 +105,18 @@
                         [<a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={{data['cluster']['ncbi_tax_id']}}">taxonomy</a>]
                     </td>
                 </tr>
-                <tr>
+                <tr class="references">
                     <td width="25%">
                         <strong>References</strong>
                     </td>
                     <td>
-                        <ul style="padding: 0; margin: 0; list-style: none;">
+                        <ul>
                             {% for url in publications_links %}
                             <li>
-                                <a href="{{url}}">{{url}}</a>
+                                <a href="{{url.ref}}">{{url.title}}</a>
+                                {% if url.info %}
+                                <span class="author-info">{{url.info}}</span>
+                                {% endif %}
                             </li>
                             {% endfor %}
                         </ul>

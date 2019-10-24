@@ -60,6 +60,37 @@ nav {
     display: none;  // hides subregions in region SVG
 }
 
+.references {
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        padding-left: 1em;
+    }
+
+    li:before {
+        content: "\f02d";
+        font-family: FontAwesome;
+        display: inline-block;
+        margin-left: -1em;
+        width: 1em;
+    }
+
+    .author-info {
+        margin-left: 0.5em;
+    }
+
+    a {
+        background: none;
+        color: $antismash-main;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
 .footer {
     .container {
         font-size: small;

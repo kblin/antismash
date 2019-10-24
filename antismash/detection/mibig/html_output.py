@@ -3,7 +3,10 @@
 
 """ Handles HTML output for the MIBiG sideloader """
 
+import os
 from typing import List
+
+from eutils import Client
 
 from antismash.common import path
 from antismash.common.module_results import ModuleResults
@@ -26,19 +29,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
 
     html = HTMLSections("mibig-general")
     taxonomy_text = " > ".join(["{} ({})".format(taxobj["name"], taxobj["rank"]) for taxobj in taxonomy])
-    publications_links = []
-    for pub in data["cluster"]["publications"]:
-        [category, index] = pub.split(":", 1)
-        if category == "pubmed":
-            url = "https://www.ncbi.nlm.nih.gov/pubmed/{}".format(index)
-        elif category == "patent":
-            url = "https://patents.google.com/patent/{}".format(index)
-        elif category == "doi":
-            url = "https://dx.doi.org/{}".format(index)
-        elif category == "url":
-            url = index
-        publications_links.append(url)
-    html.add_detail_section("General", FileTemplate(path.get_full_path(__file__, "templates", "general.html")).render(data=results.data, taxonomy_text=taxonomy_text, publications_links=publications_links))
+    publications_links = ReferenceCollection(data["cluster"]["publications"])
+    html.add_detail_section("General", FileTemplate(path.get_full_path(__file__, "templates", "general.html")).render(data=results.data, taxonomy_text=taxonomy_text, publications_links=publications_links.links()))
 
     for compound in results.data["cluster"]["compounds"]:
         compound["keys"] = [key for key in compound.keys() if (key not in ["compound", "chem_struct"]) and (not isinstance(compound[key], list) or len(compound[key]) > 0)]
@@ -139,3 +131,64 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
                                 class_name="mibig-logs")
 
     return html
+
+
+class ReferenceLink:
+    """Keep track of a single reference link."""
+
+    __slots__ = (
+        'category',
+        'ref',
+        'title',
+        'info',
+    )
+
+    def __init__(self, category: str, reference: str, title: str, info: str = None) -> None:
+        self.category = category
+        self.ref = reference
+        self.title = title
+        self.info = info
+
+
+class ReferenceCollection:
+    """Keep track of all references in a MIBiG entry."""
+
+    __slots__ = (
+        'client',
+        'references',
+    )
+
+    def __init__(self, publications: List[str]) -> None:
+        self.client = Client(api_key=os.environ.get("NCBI_API_KEY", None))
+        self.references = {}  # Dict[ReferenceLink]
+        pmids = []
+
+        for publication in publications:
+            [category, index] = publication.split(":", 1)
+            title = index
+            info = None
+
+            if category == "pubmed":
+                reference = "https://www.ncbi.nlm.nih.gov/pubmed/{}".format(index)
+                pmids.append(index)
+            elif category == "patent":
+                reference = "https://patents.google.com/patent/{}".format(index)
+            elif category == "doi":
+                reference = "https://dx.doi.org/{}".format(index)
+            elif category == "reference":
+                reference = index
+
+            self.references[index] = ReferenceLink(category, reference, title, info)
+
+        self._resolve_pmids(pmids)
+
+
+    def links(self) -> List[ReferenceLink]:
+        return self.references.values()
+
+
+    def _resolve_pmids(self, pmids: List[str]) -> None:
+        articles = self.client.efetch(db="pubmed", id=pmids)
+        for article in articles:
+            self.references[article.pmid].title = article.title
+            self.references[article.pmid].info = "{a.authors[0]} et al., {a.jrnl} ({a.year}) PMID:{a.pmid}".format(a=article)
