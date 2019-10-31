@@ -60,6 +60,18 @@ nav {
     display: none;  // hides subregions in region SVG
 }
 
+a {
+    background: none;
+    padding: 0;
+
+    &:link, &:visited {
+        color: $antismash-main;
+    }
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 .references {
     ul {
         list-style: none;
