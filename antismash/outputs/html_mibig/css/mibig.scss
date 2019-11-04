@@ -79,28 +79,39 @@ a, .compound-link {
         padding: 0;
     }
 
-    li {
-        padding-left: 1em;
-    }
-
-    li:before {
-        content: "\f02d";
-        font-family: FontAwesome;
-        display: inline-block;
-        margin-left: -1em;
-        width: 1em;
-    }
-
     .author-info {
         margin-left: 0.5em;
     }
 
-    a {
-        background: none;
-        color: $antismash-main;
-        &:hover {
-            text-decoration: underline;
-        }
+}
+
+.contributors, .changelog-notes {
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+}
+
+.contributor-id {
+    font-family: monospace;
+}
+
+.table {
+    width: 100%;
+
+    th {
+        border-bottom: 2px solid #ddd;
+        font-weight: bold;
+    }
+    td {
+        border-bottom: 1px solid #ddd;
+        vertical-align: middle;
+    }
+}
+
+.table-striped {
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
     }
 }
 

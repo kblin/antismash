@@ -3,28 +3,42 @@
     <span>Annotation changelog</span>
     </div>
     <div>
-        <table border="1" style="width: 100%;">
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th style="width: 8em; text-align: center;">MIBiG version</th>
-                    <th style="min-width: 15em; text-align: center;">Notes</th>
+                    <th>MIBiG version</th>
+                    <th>Submitter</th>
+                    <th>Notes</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in logs %}
                 <tr>
-                    <td style="margin: 0; padding: 0; text-align: center; vertical-align:middle;">
+                    <td>
                         <strong>{{log["version"]}}</strong>
                     </td>
-                    <td>
-                        <ul style="padding: 0; padding-left: 1em; margin: 0;">
+                    <td class="contributors">
+                      <ul>
+                        {% for contributor in log["contributors"] %}
+                        <li class="contributor" id="{{contributor}}">
+                          <svg class="icon"><use xlink:href="images/icons.svg#user-secret"></use></svg>
+                          Anonymous contributor (ID: <span class="contributor-id">{{contributor}}</span>)
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </td>
+                    <td class="changelog-notes">
+                        <ul>
                             {% for comment in log["comments"] %}
-                            <li>{{comment}}</li>
+                            <li>
+                              <svg class="icon"><use xlink:href="images/icons.svg#comment"></use></svg>
+                              {{comment}}
+                            </li>
                             {% endfor %}
-                        </ul>            
+                        </ul>
                     </td>
                 </tr>
-                {% endfor %}                        
+                {% endfor %}
             </tbody>
         </table>
     </div>
