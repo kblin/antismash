@@ -3,7 +3,7 @@
     <span>General information about the BGC</span>
     </div>
     <div>
-        <table border="1" style="width: 100%">
+        <table class="table table-striped">
             <tbody>
                 <tr>
                     <td width="25%">
@@ -63,7 +63,7 @@
                                     {% endif %}
                                 {% endif %}
                                 </li>
-                            {% endfor %}        
+                            {% endfor %}
                         </ul>
                     </td>
                 </tr>
@@ -79,7 +79,7 @@
                                 {% set startend="?from={}&to={}".format(data["cluster"]["loci"]["start_coord"], data["cluster"]["loci"]["end_coord"]) %}
                             {% else %}
                                 {% set startend="" %}
-                            {% endif %}              
+                            {% endif %}
                             NCBI GenBank: <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data["cluster"]["loci"]["accession"]}}</a>
                         {% endif %}
                     </td>
