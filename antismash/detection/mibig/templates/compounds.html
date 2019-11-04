@@ -27,7 +27,7 @@
                     </td>
                     {% endif %}
                     <td colspan="2" style="vertical-align: text-top;">
-                        <strong>{{compound["compound"]}}</strong>
+                      <strong id="{{compound['compound']|replace(' ', '-')}}">{{compound["compound"]}}</strong>
                         {% if compound.get("chem_synonyms") %}
                         [<a href="javascript: alert('This compound is also known as: {{'; '.join(compound['chem_synonyms'])}}');">synonyms</a>]
                         {% endif %}

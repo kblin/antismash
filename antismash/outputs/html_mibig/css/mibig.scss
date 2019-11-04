@@ -60,9 +60,10 @@ nav {
     display: none;  // hides subregions in region SVG
 }
 
-a {
+a, .compound-link {
     background: none;
     padding: 0;
+    color: $antismash-main;
 
     &:link, &:visited {
         color: $antismash-main;

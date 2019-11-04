@@ -91,7 +91,11 @@
                     <td>
                         <ul style="padding: 0; margin: 0; list-style: none;">
                             {% for compound in data["cluster"]["compounds"] %}
-                            <li>{{compound["compound"]}}</li>
+                            <li>
+                              <span class="compound-link" data-name="{{compound['compound']|replace(' ', '-')}}">
+                                {{compound["compound"]}}
+                              </span>
+                            </li>
                             {% endfor %}
                         </ul>
                     </td>
