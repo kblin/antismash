@@ -22,7 +22,7 @@
                         {% for contributor in log["contributors"] %}
                         <li class="contributor" id="{{contributor}}">
                           <svg class="icon"><use xlink:href="images/icons.svg#user-secret"></use></svg>
-                          Anonymous contributor (ID: <span class="contributor-id">{{contributor}}</span>)
+                          Hidden contributor (ID: <span class="contributor-id">{{contributor}}</span>, no GDPR consent given).
                         </li>
                         {% endfor %}
                       </ul>
