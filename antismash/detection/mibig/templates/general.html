@@ -117,6 +117,7 @@
                         <ul>
                             {% for url in publications_links %}
                             <li>
+                              <svg class="icon"><use xlink:href="images/icons.svg#book"></use></svg>
                                 <a href="{{url.ref}}">{{url.title}}</a>
                                 {% if url.info %}
                                 <span class="author-info">{{url.info}}</span>
