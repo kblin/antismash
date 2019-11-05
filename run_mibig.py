@@ -35,7 +35,7 @@ def _main():
         gbk_path = path.join(gbk_folder, "{}.gbk".format(gbk_acc))
         cache_json_path = path.join(cache_folder, "{}.cache.json".format(mibig_acc))
         output_path = path.join(output_folder, mibig_acc)
-        reusable_json_path = path.join(output_path, "{}.json".format(gbk_acc))
+        reusable_json_path = path.join(output_path, "{}.1.json".format(mibig_acc))
 
         # load/populate cache in advance, because it is needed to fetch taxonomy information
         cached = load_cached_information(data, cache_json_path, True)
