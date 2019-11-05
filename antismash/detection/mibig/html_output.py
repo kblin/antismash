@@ -46,7 +46,7 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
             "gene": cds_feature.gene,
             "start": cds_feature.location.start + 1,
             "end": cds_feature.location.end,
-            "strand": cds_feature.location.strand,
+            "strand": "+" if cds_feature.location.strand > 0 else "-",
             "product": cds_feature.product,
             "aa_seq": cds_feature.translation,
             "nt_seq": cds_feature.extract(record_layer.seq)
@@ -75,11 +75,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
                     function_text += " ({}) ".format(", ".join(annot['tailoring']))
                 else:
                     function_text += " "
-                function_text += "(evidence: "
-                for evidence in function['evidence']:
-                    function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
-                function_text += ")"
                 gene["functions"].append(function_text)
+                gene["evidences"] = sorted(list(set(function['evidence'])))
             if "mut_pheno" in gene:
                 function_text = "Mutation phenotype: {}".format(gene["mut_pheno"])
                 gene["functions"].append(function_text)
@@ -100,9 +97,8 @@ def generate_html(region_layer: RegionLayer, results: ModuleResults,
                 function_text += " ({}) ".format(", ".join(annot['tailoring']))
             else:
                 function_text += " "
-            for evidence in function['evidence']:
-                function_text += "<span class='mibig-gf-evidence-{}' title='{}'>{}</span>".format(evidence[0], evidence, evidence[0])
             gene["functions"].append(function_text)
+            gene["evidences"] = sorted(list(set(function['evidence'])))
         genes.append(gene)
     html.add_detail_section("Genes", FileTemplate(path.get_full_path(__file__, "templates", "genes.html")).render(genes=genes),
                             class_name="mibig-genes")
