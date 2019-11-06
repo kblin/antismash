@@ -32,7 +32,7 @@ class MibigAnnotations(DetectionResults):
         cached = load_cached_information(data, cache_file)
         # save extra information from cache
         self.taxonomy = cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]
-        
+
     def get_predicted_subregions(self) -> List[SubRegion]:
         return [self.area]
 
@@ -51,7 +51,7 @@ class MibigAnnotations(DetectionResults):
     def from_json(prev: Dict[str, Any], record: Record, annotations_file: str, cache_file: str) -> Optional["MibigAnnotations"]:
         with open(annotations_file) as handle:
             data = json.load(handle)
-        
+
         # compare old vs new annotation, decide if we can 'reuse'
         can_reuse = True
         loci = data["cluster"]["loci"]
@@ -151,7 +151,7 @@ def load_cached_information(annotations, cache_json_path, update=True):
     ncbi_tax_id = annotations["cluster"]["ncbi_tax_id"]
     if ncbi_tax_id not in cached["taxonomy"]:
         cached["taxonomy"][ncbi_tax_id] = get_ncbi_taxonomy(ncbi_tax_id, ncbi_email)
-    
+
     # fetch BibTex for publications
     # ....
 
@@ -167,10 +167,10 @@ def save_cached_information(cached, cache_json_path):
     with open(cache_json_path, "w") as handle:
         handle.write(json.dumps(cached, indent=4, separators=(',', ': '), sort_keys=True))
 
-    
+
 def get_ncbi_taxonomy(tax_id, email):
     """fetch taxonomy information from ncbi_tax_id"""
-    taxonomy = []    
+    taxonomy = []
     Entrez.email = email
     num_try = 1
     while num_try < 6:
@@ -190,5 +190,5 @@ def get_ncbi_taxonomy(tax_id, email):
         time.sleep(5)
     if len(taxonomy) > 1: # shuffle species to the end of the list
         taxonomy.append(taxonomy.pop(0))
-        
+
     return taxonomy
