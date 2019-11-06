@@ -3,7 +3,7 @@
        <span>NRP-specific information</span>
     </div>
     <div>
-        <table border="1" style="width: 100%; margin-bottom: .4em;">
+        <table class="table table-striped">
             <tbody>
                 <tr>
                     <td width="25%">
@@ -60,7 +60,7 @@
                             </li>
                             {% endfor %}
                         </ul>
-                    </td>    
+                    </td>
                 </tr>
                 {% endif %}
             </tbody>
@@ -71,7 +71,7 @@
        <span>NRP-synthases</span>
     </div>
     <div>
-        <table border="1" style="width: 100%;">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th style="width: 9em; text-align:center;">Gene</th>
@@ -110,7 +110,7 @@
                                 </ul>
                                 {% if module["a_substr_spec"].get("aa_subcluster") %}
                                 Genes encoding specified AA: {{", ".join(module["a_substr_spec"]["aa_subcluster"])}}<br />
-                                {% endif %}                                
+                                {% endif %}
                                 {% endif %}
                                 {% if "c_dom_subtype" in module %}
                                 Condensation domain type: {{module["c_dom_subtype"]}} <br />
