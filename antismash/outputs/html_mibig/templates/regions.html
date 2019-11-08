@@ -9,25 +9,25 @@
   <div class="content">
     <div class="description-container">
       <div class="heading">
-        {{data["cluster"]["mibig_accession"]}}: {{data["cluster"]["compounds"][0]["compound"]}} biosynthetic gene cluster from <i>{{data["cluster"]["organism_name"]}}</i>
+        {{data.cluster.mibig_accession}}: {{data.cluster.compounds[0].compound}} biosynthetic gene cluster from <i>{{data.cluster.organism_name}}</i>
         {{help_tooltip(svg_tooltip, "region_svg")}}
       </div>
       <div class="region-download">
         <a href="./generated/index.html#r1c1">View antiSMASH-generated output</a>
       </div>
       <div class="region-download">
-        <a href="{{ '%s.1.region%03d.gbk' % (data["cluster"]["mibig_accession"], region.get_region_number()) }}"">Download Cluster GenBank file</a>
+        <a href="{{ '%s.1.region%03d.gbk' % (data.cluster.mibig_accession, region.get_region_number()) }}">Download Cluster GenBank file</a>
       </div>
       <div class = 'description-text'>
         {{region.description_text()}}.
-        {% if not data["cluster"]["loci"]["accession"].startswith("MIBIG") %}
+        {% if not data.cluster.loci.accession.startswith("MIBIG") %}
         <br />
-        {% if "start_coord" in data["cluster"]["loci"] %}
-          {% set startend="?from={}&to={}".format(data["cluster"]["loci"]["start_coord"], data["cluster"]["loci"]["end_coord"]) %}
+        {% if data.cluster.loci.start %}
+          {% set startend="?from={}&to={}".format(data.cluster.loci.start, data.cluster.loci.end) %}
         {% else %}
           {% set startend="" %}
         {% endif %}
-        This entry is originally from NCBI GenBank <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data["cluster"]["loci"]["accession"]}}</a>
+        This entry is originally from NCBI GenBank <a href="https://www.ncbi.nlm.nih.gov/nuccore/{{data['cluster']['loci']['accession']}}{{startend}}">{{data.cluster.loci.accession}}</a>
         {%- if record.get_alterations() -%}
             , but <span class="modification-warning">has been modified</span> (see Modifications tab for details)
         {%- endif %}.

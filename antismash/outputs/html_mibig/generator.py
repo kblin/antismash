@@ -50,8 +50,8 @@ def build_json_data(records: List[Record], results: List[Dict[str, module_result
         json_record = js_records[i]
         # replace antismash cds_detail with mibig's one
         try:
-            cds_annotations = results[i]["antismash.detection.mibig"].data["cluster"]["genes"]["annotations"]
-        except KeyError:
+            cds_annotations = results[i]["antismash.detection.mibig"].data.cluster.genes.annotations
+        except AttributeError:
             cds_annotations = []
         update_cds_description(json_record, cds_annotations)
 
@@ -162,10 +162,10 @@ def update_cds_description(js_record, annotations):
     id_to_annotations = {}
     template = html_renderer.FileTemplate(path.get_full_path(__file__, "templates", "cds_detail.html"))
     for annotation in annotations:
-        if "id" in annotation and annotation["id"]:
-            id_to_annotations[annotation["id"]] = annotation
-        if "name" in annotation and annotation["name"]:
-            id_to_annotations[annotation["name"]] = annotation
+        if annotation.id:
+            id_to_annotations[annotation.id] = annotation
+        if annotation.name:
+            id_to_annotations[annotation.name] = annotation
     for reg_idx, js_region in enumerate(js_record["regions"]):
         for cds_idx, js_cds in enumerate(js_region["orfs"]):
             desc_html = js_cds["description"]

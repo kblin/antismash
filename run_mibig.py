@@ -10,6 +10,7 @@ from sys import argv, exit
 from subprocess import call
 from shutil import rmtree
 from datetime import datetime
+from mibig.converters.read.top import Everything
 from antismash.detection.mibig.mibig import load_cached_information
 
 def write_log(text, file_path):
@@ -29,9 +30,10 @@ def _main():
     antismash_path = path.abspath(path.dirname(__file__))
 
     with open(json_path, "r") as json_file:
-        data = json.load(json_file)
-        mibig_acc = data["cluster"]["mibig_accession"]
-        gbk_acc = data["cluster"]["loci"]["accession"]
+        raw = json.load(json_file)
+        data = Everything(raw)
+        mibig_acc = data.cluster.mibig_accession
+        gbk_acc = data.cluster.loci.accession
         gbk_path = path.join(gbk_folder, "{}.gbk".format(gbk_acc))
         cache_json_path = path.join(cache_folder, "{}.cache.json".format(mibig_acc))
         output_path = path.join(output_folder, mibig_acc)
@@ -39,7 +41,7 @@ def _main():
 
         # load/populate cache in advance, because it is needed to fetch taxonomy information
         cached = load_cached_information(data, cache_json_path, True)
-        taxonomy = [tax_obj["name"] for tax_obj in cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]]
+        taxonomy = [tax_obj["name"] for tax_obj in cached["taxonomy"][data.cluster.ncbi_tax_id]]
 
         if "Bacteria" in taxonomy:
             taxon = "bacteria"

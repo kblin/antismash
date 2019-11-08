@@ -24,6 +24,7 @@ install_requires = [
     'pysvg-py3',
     'bcbio-gff',
     'pyScss',
+    'python-mibig',
     'matplotlib',
     'scipy',
     'scikit-learn >= 0.19.0',

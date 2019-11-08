@@ -1,74 +1,57 @@
 <div class="details">
-    <div class="heading">
-        <span>Chemical products information</span>
+  <div class="heading">
+    <span>Chemical products information</span>
+  </div>
+  {% for compound in compounds %}
+  <div class="compound-container">
+    <div class="compound-name">
+      <strong id="{{compound.compound|replace(' ', '-')}}">{{compound.compound}}</strong>
+      {% if compound.chem_synonyms %}
+      [synonyms: {{', '.join(compound.chem_synonyms)}}]
+      {% endif %}
     </div>
-    <div>
-        {% for compound in compounds %}
-        <div style="margin-bottom: 0.25em;">
-            <table class="table table-striped">
-                <tbody>
-                    <tr style="font-size: 1.2em;">
-                    {% set keys = compound["keys"] %}
-                    {% if compound.get("chem_struct") %}
-                    <td rowspan="{{keys|length + 1}}" width="30%" style="text-align: center; vertical-align:middle;">
-                        <canvas id="compound-drawing" width="100%" class="smiles-canvas" data-smiles="{{compound['chem_struct']}}"></canvas>
-                        <div class="focus-clipboard">
-                            <span class="clipboard-copy" data-seq="{{compound['chem_struct']}}">Copy SMILES</span>
-                        </div>
-                        <div id="compound-drawing-modal" class="modal-container">
-                            <div class="modal-content">
-                                <canvas class="smiles-canvas-modal" data-smiles="{{compound['chem_struct']}}"></canvas>
-                            </div>
-                        </div>
-                    </td>
-                    {% else %}
-                    <td rowspan="{{keys|length + 1}}" width="30%">
-                        <div width="100%" style="text-align: center; vertical-align:middle;">(no structure information available)</div>
-                    </td>
-                    {% endif %}
-                    <td colspan="2" style="vertical-align: text-top;">
-                      <strong id="{{compound['compound']|replace(' ', '-')}}">{{compound["compound"]}}</strong>
-                        {% if compound.get("chem_synonyms") %}
-                        [<a href="javascript: alert('This compound is also known as: {{'; '.join(compound['chem_synonyms'])}}');">synonyms</a>]
-                        {% endif %}
-                    </td>
-                    </tr>
-                    {% if "molecular_formula" in compound %}
-                    <tr>
-                        <td width="25%" style="vertical-align: text-top;">
-                            <strong>Molecular Formula</strong>
-                        </td>
-                        <td style="vertical-align: text-top;">
-                            {{compound["molecular_formula"]}}
-                        </td>
-                    </tr>
-                    {% endif %}
-                    {% if compound.get("database_id", []) %}
-                    <tr>
-                        <td width="25%" style="vertical-align: text-top;">
-                            <strong>Chemical database entries</strong>
-                        </td>
-                        <td style="vertical-align: text-top;">
-                            {% for ref in compound["database_id"] %}
-                            {% set db_id = ref.split(':')[1] %}
-                            {% if ref.startswith("npatlas:") %}
-                            <a href="https://www.npatlas.org/joomla/index.php/explore/compounds#npaid=NPA{{'%06d' % db_id|int}}.html">NPAtlas</a>&nbsp;&nbsp;
-                            {% elif ref.startswith("pubchem:") %}
-                            <a href="https://pubchem.ncbi.nlm.nih.gov/compound/{{db_id}}">PubCHEM</a>&nbsp;&nbsp;
-                            {% elif ref.startswith("chebi:") %}
-                            <a href="https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI%3A{{db_id}}">ChEBI</a>&nbsp;&nbsp;
-                            {% elif ref.startswith("chembl:") %}
-                            <a href="https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL{{db_id}}">ChEMBL</a>&nbsp;&nbsp;
-                            {% elif ref.startswith("chemspider:") %}
-                            <a href="http://www.chemspider.com/Chemical-Structure.{{db_id}}.html">ChemSpider</a>&nbsp;&nbsp;
-                            {% endif %}
-                            {% endfor %}
-                        </td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+    <div class="compound-structure">
+      <div class="box">
+        {% if compound.chem_struct %}
+        <canvas id="compound-drawing" width="100%" class="smiles-canvas" data-smiles="{{compound.chem_struct}}"></canvas>
+        <div class="focus-clipboard">
+          <span class="clipboard-copy" data-seq="{{compound.chem_struct}}">Copy SMILES</span>
         </div>
-        {% endfor %}
+        <div id="compound-drawing-modal" class="modal-container">
+          <div class="modal-content">
+            <canvas class="smiles-canvas-modal" data-smiles="{{compound.chem_struct}}"></canvas>
+          </div>
+        </div>
+        {% else %}
+        (no structure information available)
+        {% endif %}
+      </div>
     </div>
+    <div class="compound-formula">
+      <div class="box">
+      {% for part in compound.molecular_formula.parts %}{{part.atom}}<sub>{{part.count}}</sub>{% endfor %}
+      </div>
+    </div>
+    <div class="compound-references">
+      <div class="box">
+      {% if compound.database_id %}
+      Chemical database entries<br>
+      {% for entry in compound.database_id %}
+      {% if entry.db == "npatlas" %}
+      <a href="https://www.npatlas.org/joomla/index.php/explore/compounds#npaid=NPA{{'%06d' % entry.reference|int}}.html">NPAtlas</a><br>
+      {% elif entry.db == "pubchem" %}
+      <a href="https://pubchem.ncbi.nlm.nih.gov/compound/{{entry.reference}}">PubCHEM</a><br>
+      {% elif entry.db == "chebi" %}
+      <a href="https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI%3A{{entry.reference}}">ChEBI</a><br>
+      {% elif entry.db == "chembl" %}
+      <a href="https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL{{entry.reference}}">ChEMBL</a><br>
+      {% elif entry.db == "chemspider" %}
+      <a href="http://www.chemspider.com/Chemical-Structure.{{entry.reference}}.html">ChemSpider</a><br>
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>

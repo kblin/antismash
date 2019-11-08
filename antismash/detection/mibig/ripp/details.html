@@ -10,7 +10,7 @@
                         <strong>Subclass</strong>
                     </td>
                     <td>
-                        {{ripp.get("subclass", "Unknown")}}
+                        {{ripp.subclass}}
                     </td>
                 </tr>
                 <tr>
@@ -18,17 +18,17 @@
                         <strong>Cyclic?</strong>
                     </td>
                     <td>
-                        {{"yes" if ripp.get("cyclic") else "no"}}
+                        {{"yes" if ripp.cyclic else "no"}}
                     </td>
                 </tr>
-                {% if "peptidases" in ripp %}
+                {% if ripp.peptidases %}
                 <tr>
                     <td width="25%">
                         <strong>Peptidases</strong>
                     </td>
                     <td>
                         <ul style="padding: 0; margin: 0; list-style: none;">
-                            {% for pep in ripp["peptidases"] %}
+                            {% for pep in ripp.peptidases %}
                             <li>
                                 {{pep}}
                             </li>
@@ -37,45 +37,50 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if "precursor_genes" in ripp %}
-                {% for precursor in ripp["precursor_genes"] %}
+                {% for precursor in ripp.precursor_genes %}
                 <tr>
                     {% if loop.index == 1 %}
-                    <td rowspan="{{ripp['precursor_genes']|length}}" style="text-align:center; vertical-align: middle;">
+                    <td rowspan="{{ripp.precursor_genes|length}}" style="text-align:center; vertical-align: middle;">
                     Precursor genes
                     </td>
                     {% endif %}
                     <td>
                         <div style="margin-bottom: 1em;">
                             <strong>
-                                >{{precursor["gene_id"]}}
+                                >{{precursor.gene_id}}
                             </strong><br />
-                            Leader sequence: {{precursor.get("leader_sequence", "?")}}<br />
-                            Recognition motif: {{precursor.get("recognition_motif", "?")}}<br />
+                            {% if precursor.leader_sequence %}
+                            Leader sequence: {{precursor.leader_sequence}}<br />
+                            {% endif %}
+                            {% if precursor.recognition_motif %}
+                            Recognition motif: {{precursor.recognition_motif}}<br />
+                            {% endif %}
                             Core sequences: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for seq in precursor["core_sequence"] %}
+                                {% for seq in precursor.core_sequence %}
                                 <li>
                                     {{seq}}
                                 </li>
                                 {% endfor %}
                             </ul>
-                            Follower sequence: {{precursor.get("follower_sequence", "?")}}<br />
-                            {% if precursor.get("crosslinks") %}
+                            {% if precursor.follower_sequence %}
+                            Follower sequence: {{precursor.follower_sequence}}<br />
+                            {% endif %}
+                            {% if precursor.crosslinks %}
                             Crosslinks: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for cl in precursor["crosslinks"] %}
+                                {% for cl in precursor.crosslinks %}
                                 <li>
-                                    {{cl.get("first_AA", "?")}}x{{cl.get("second_AA", "?")}}
-                                    ({{cl["crosslink_type"]}})
+                                    {{cl.first_AA_position}}x{{cl.second_AA_position}}
+                                    ({{cl.type}})
                                 </li>
                                 {% endfor %}
                             </ul>
                             {% endif %}
-                            {% if precursor.get("cleavage_recogn_site") %}
+                            {% if precursor.cleavage_recognition_sites %}
                             Cleavage recognition sites: <br />
                             <ul style="padding:0; padding-left: 1em; margin:0;">
-                                {% for site in precursor["cleavage_recogn_site"] %}
+                                {% for site in precursor.cleavage_recognition_sites %}
                                 <li>
                                     {{site}}
                                 </li>
@@ -86,7 +91,6 @@
                     </td>
                 </tr>
                 {% endfor %}
-                {% endif %}
             </tbody>
         </table>
     </div>

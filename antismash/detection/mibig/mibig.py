@@ -19,51 +19,60 @@ from antismash.common.secmet.locations import FeatureLocation, CompoundLocation
 
 from urllib.error import HTTPError
 from antismash.common.errors import AntismashInputError
+from mibig.converters.read.top import Everything
+
 
 class MibigAnnotations(DetectionResults):
-    def __init__(self, record_id: str, area: SubRegion, data: Dict[str, Any], cache_file: str) -> None:
+    def __init__(self, record_id: str, area: SubRegion, data: Everything, cache_file: str) -> None:
         super().__init__(record_id)
         self.data = data # holds the original annotation json data
         # save calculated loci (relative to record), not annotated ones
         self.record_id = record_id
-        loci = data["cluster"]["loci"]
+        loci = data.cluster.loci
         self.area = area
         # fetch/update cached information (for taxonomy, etc.)
         cached = load_cached_information(data, cache_file)
         # save extra information from cache
-        self.taxonomy = cached["taxonomy"][data["cluster"]["ncbi_tax_id"]]
+        self.taxonomy = cached["taxonomy"][data.cluster.ncbi_tax_id]
 
     def get_predicted_subregions(self) -> List[SubRegion]:
         return [self.area]
 
     def to_json(self) -> Dict[str, Any]:
         # save only information critical for deciding reusability
-        loci = self.data["cluster"]["loci"]
+        loci = self.data.cluster.loci
+        annotations = []
+        for annot in (self.data.cluster.genes.annotations if self.data.cluster.genes else []):
+            annotations.append(annot.to_json())
+        extra_genes = []
+        for extra_gene in (self.data.cluster.genes.extra_genes if self.data.cluster.genes else []):
+            extra_genes.append(extra_gene.to_json())
         return {
             "record_id": self.record_id,
-            "genbank_accession": loci["accession"],
-            "coords": (loci.get("start_coord", -1), loci.get("end_coord", -1)),
-            "gene_annotations": self.data["cluster"].get("genes", {}).get("annotations", []),
-            "extra_genes": self.data["cluster"].get("genes", {}).get("extra_genes", [])
+            "genbank_accession": loci.accession,
+            "coords": (loci.start or -1, loci.end or -1),
+            "gene_annotations": annotations,
+            "extra_genes": extra_genes,
         }
 
     @staticmethod
     def from_json(prev: Dict[str, Any], record: Record, annotations_file: str, cache_file: str) -> Optional["MibigAnnotations"]:
         with open(annotations_file) as handle:
-            data = json.load(handle)
+            raw = json.load(handle)
+            data = Everything(raw)
 
         # compare old vs new annotation, decide if we can 'reuse'
         can_reuse = True
-        loci = data["cluster"]["loci"]
-        gene_annotations = data["cluster"].get("genes", {}).get("annotations", [])
-        extra_genes = data["cluster"].get("genes", {}).get("extra_genes", [])
-        if loci["accession"] != prev["genbank_accession"]:
+        loci = data.cluster.loci
+        gene_annotations = data.cluster.genes.annotations if data.cluster.genes else []
+        extra_genes = data.cluster.genes.extra_genes if data.cluster.genes else []
+        if loci.accession != prev["genbank_accession"]:
             logging.debug("Previous result's genbank_accession is not the same as the new one")
             can_reuse = False
         elif record.id != prev["record_id"]:
             logging.debug("Previous result's record_id is not the same as the new one")
             can_reuse = False
-        elif loci.get("start_coord", -1) != prev["coords"][0] or loci.get("end_coord", -1) != prev["coords"][1]:
+        elif (loci.start or -1)  != prev["coords"][0] or (loci.end or -1) != prev["coords"][1]:
             logging.debug("Previous result's start/end coordinate is not the same as the new one")
             can_reuse = False
         elif len(gene_annotations) != len(prev["gene_annotations"]):
@@ -77,10 +86,10 @@ class MibigAnnotations(DetectionResults):
 
         # if we can't reuse, stop running antismash, because CDS annotations won't be correct
         if can_reuse:
-            product = ", ".join(data["cluster"]["biosyn_class"])
+            product = ", ".join(data.cluster.biosynthetic_class)
             loci_region = FeatureLocation(
-                loci.get("start_coord", 1) - 1,
-                loci.get("end_coord", len(record.seq))
+                loci.start - 1 if loci.start else 0,
+                loci.end or len(record.seq)
             )
             area = SubRegion(loci_region, tool="mibig", label=product)
             return MibigAnnotations(record.id, area, data, cache_file)
@@ -92,43 +101,44 @@ class MibigAnnotations(DetectionResults):
 def mibig_loader(annotations_file: str, cache_file: str, record: Record) -> MibigAnnotations:
     """This method will be called only when not reusing data"""
     with open(annotations_file) as handle:
-        data = json.load(handle)
+        raw = json.load(handle)
+        data = Everything(raw)
 
-    product = ", ".join(data["cluster"]["biosyn_class"])
-    loci = data["cluster"]["loci"]
+    product = ", ".join(data.cluster.biosynthetic_class)
+    loci = data.cluster.loci
     loci_region = FeatureLocation(
-        loci.get("start_coord", 1) - 1,
-        loci.get("end_coord", len(record.seq))
+        loci.start - 1 if loci.start else 0,
+        loci.end or len(record.seq)
     )
     area = SubRegion(loci_region, tool="mibig", label=product)
 
     # re-annotate CDSes in the Record
-    if "genes" in data["cluster"]:
+    if data.cluster.genes:
         # extra genes
-        for gene in data["cluster"]["genes"].get("extra_genes", []):
-            if "id" in gene and "location" in gene:
+        for gene in data.cluster.genes.extra_genes:
+            if gene.id and gene.location:
                 # todo: check if exist in gbk
-                exons = [FeatureLocation(exon["start"] - 1, exon["end"], strand=gene["location"]["strand"]) for exon in gene["location"]["exons"]]
+                exons = [FeatureLocation(exon.start - 1, exon.end, strand=gene.location.strand) for exon in gene.location.exons]
                 location = CompoundLocation(exons) if len(exons) > 1 else exons[0]
-                translation = gene.get("translation", record.get_aa_translation_from_location(location))
-                cds_feature = CDSFeature(location=location, locus_tag=gene["id"], translation=translation)
+                translation = gene.translation or record.get_aa_translation_from_location(location)
+                cds_feature = CDSFeature(location=location, locus_tag=gene.id, translation=translation)
                 record.add_cds_feature(cds_feature)
         # re-annotation
         for cds_feature in record.get_cds_features_within_location(area.location):
             locus_tag = cds_feature.locus_tag
             protein_id = cds_feature.protein_id
             name = cds_feature.gene
-            for annot in data["cluster"]["genes"].get("annotations", []):
-                if locus_tag and annot["id"] == locus_tag:
+            for annot in (data.cluster.genes.annotations if data.cluster.genes else []):
+                if locus_tag and annot.id == locus_tag:
                     pass
-                elif protein_id and annot["id"] == protein_id:
+                elif protein_id and annot.id == protein_id:
                     pass
-                elif name and annot.get("name", None) == name:
+                elif name and annot.name == name:
                     pass
                 else:
                     continue
-                if "product" in annot:
-                    cds_feature.product = annot["product"]
+                if annot.product:
+                    cds_feature.product = annot.product
 
     return MibigAnnotations(record.id, area, data, cache_file)
 
@@ -148,7 +158,7 @@ def load_cached_information(annotations, cache_json_path, update=True):
     # fetch taxonomy information
     if "taxonomy" not in cached:
         cached["taxonomy"] = {}
-    ncbi_tax_id = annotations["cluster"]["ncbi_tax_id"]
+    ncbi_tax_id = annotations.cluster.ncbi_tax_id
     if ncbi_tax_id not in cached["taxonomy"]:
         cached["taxonomy"][ncbi_tax_id] = get_ncbi_taxonomy(ncbi_tax_id, ncbi_email)
 

@@ -77,6 +77,45 @@ a, .compound-link {
     cursor: pointer;
 }
 
+.compound-container {
+    width: 90%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-rows: 1.5em;
+    grid-template-columns: 1fr 1fr 2fr;
+    grid-gap: 10px;
+
+    &:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+}
+
+.compound-name {
+    grid-column: 1 / span 2;
+}
+
+.compound-structure {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+}
+
+.compound-formula {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.compound-references {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 .references {
     ul {
         list-style: none;

@@ -10,42 +10,42 @@
                         <strong>Subclass</strong>
                     </td>
                     <td>
-                        {{trp.get("carbon_count_subclass", "Unknown")}}
+                        {{trp.carbon_count_subclass or "Unknown"}}
                         /
-                        {{trp.get("structural_subclass", "Unknown")}}
+                        {{trp.structural_subclass or "Unknown"}}
                     </td>
                 </tr>
-                {% if "terpene_precursor" in trp %}
+                {% if trp.precursor%}
                 <tr>
                     <td width="25%">
                         <strong>Isoprenoid precursor</strong>
                     </td>
                     <td>
-                        {{trp["terpene_precursor"]}}
-                    </td>            
+                        {{trp.precursor}}
+                    </td>
                 </tr>
                 {% endif %}
-                {% if trp.get("prenyltransferases") %}
+                {% if trp.prenyltransferases %}
                 <tr>
                     <td width="25%">
                         <strong>Prenyltransferases</strong>
                     </td>
                     <td>
-                        {{", ".join(trp["prenyltransferases"])}}
-                    </td>            
+                        {{", ".join(trp.prenyltransferases)}}
+                    </td>
                 </tr>
                 {% endif %}
-                {% if trp.get("terpene_synth_cycl") %}
+                {% if trp.synth_cycl %}
                 <tr>
                     <td width="25%">
                         <strong>Terpene synthases/cyclases</strong>
                     </td>
                     <td>
-                        {{", ".join(trp["terpene_synth_cycl"])}}
-                    </td>            
+                        {{", ".join(trp.synth_cycl)}}
+                    </td>
                 </tr>
                 {% endif %}
             </tbody>
         </table>
-    </div>    
+    </div>
 </div>

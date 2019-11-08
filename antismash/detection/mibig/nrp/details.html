@@ -10,7 +10,7 @@
                         <strong>Subclass</strong>
                     </td>
                     <td>
-                        {{nrp.get("subclass", "n/a")}}
+                        {{nrp.subclass or "n/a"}}
                     </td>
                 </tr>
                 <tr>
@@ -18,17 +18,17 @@
                         <strong>Cyclic?</strong>
                     </td>
                     <td>
-                        {{"yes" if nrp.get("cyclic") else "no"}}
+                        {{"yes" if nrp.cyclic else "no"}}
                     </td>
                 </tr>
-                {% if nrp.get("release_type") %}
+                {% if nrp.release_type %}
                 <tr>
                     <td width="25%">
                         <strong>Release type</strong>
                     </td>
                     <td>
                         <ul style="padding: 0; margin: 0; list-style: none;">
-                            {% for rel in nrp["release_type"] %}
+                            {% for rel in nrp.release_type %}
                             <li>
                                 {{rel}}
                             </li>
@@ -37,26 +37,26 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if "lipid_moiety" in nrp %}
+                {% if nrp.lipid_moiety %}
                 <tr>
                     <td width="25%">
                         <strong>Lipid moiety</strong>
                     </td>
                     <td>
-                        {{nrp["lipid_moiety"]}}
+                        {{nrp.lipid_moiety}}
                     </td>
                 </tr>
                 {% endif %}
-                {% if nrp.get("thioesterases") %}
+                {% if nrp.thioesterases %}
                 <tr>
                     <td width="25%">
                         <strong>Thioesterase genes</strong>
                     </td>
                     <td>
                         <ul style="padding: 0; margin: 0; list-style: none;">
-                            {% for te in nrp["thioesterases"] %}
+                            {% for te in nrp.thioesterases %}
                             <li>
-                                {{te["gene"]}} ({{te["thioesterase_type"]}})
+                                {{te.gene}} ({{te.thioesterase_type}})
                             </li>
                             {% endfor %}
                         </ul>
@@ -66,7 +66,7 @@
             </tbody>
         </table>
     </div>
-    {% if nrp.get("nrps_genes") %}
+    {% if nrp.nrps_genes %}
     <div class="heading">
        <span>NRP-synthases</span>
     </div>
@@ -79,61 +79,60 @@
                 </tr>
             </thead>
             <tbody>
-                {% for nrps in nrp["nrps_genes"] %}
-                    {% for module in nrps.get("modules", [None]) %}
+                {% for nrps in nrp.nrps_genes %}
+                    {% for module in nrps.modules %}
                     <tr>
                         {% if loop.index == 1 %}
-                        <td rowspan="{{nrps.get('modules', [None])|length}}" style="text-align:center; vertical-align: middle;">{{nrps["gene_id"]}}</td>
+                        <td rowspan="{{nrps.modules|length}}" style="text-align:center; vertical-align: middle;">{{nrps.gene_id}}</td>
                         {% endif %}
                         <td style="min-width: 20em; text-align:left;">
                         {% if module != None %}
                             <div style="margin-bottom: 1em;">
                                 <strong>
-                                    Module {{module.get("module_number", "?")}}
-                                    {% if module.get("active", False) %}
+                                    Module {{module.module_number or "?"}}
+                                    {% if module.active %}
                                     [active]
                                     {% endif %}
-                                    {% if "comments" in module %}
-                                      {{help_tooltip(module["comments"], "mibig")}}
+                                    {% if module.comments %}
+                                      {{help_tooltip(module.comments, "mibig")}}
                                     {% endif %}
                                 </strong><br />
-                                {% if "a_substr_spec" in module %}
-                                {% set all_specs = module["a_substr_spec"].get("proteinogenic", [])|list + module["a_substr_spec"].get("nonproteinogenic", [])|list %}
-                                Specificity: {{"/".join(all_specs)}}<br />
+                                {% if module.specificity %}
+                                Specificity: {{module.specificity|string}}<br />
                                 Evidence for specificity: <br />
                                 <ul style="margin: 0;">
-                                    {% for evidence in module["a_substr_spec"].get("evidence", []) %}
+                                    {% for evidence in module.specificity.evidence %}
                                     <li>
                                         {{evidence}}
                                     </li>
                                     {% endfor %}
                                 </ul>
-                                {% if module["a_substr_spec"].get("aa_subcluster") %}
-                                Genes encoding specified AA: {{", ".join(module["a_substr_spec"]["aa_subcluster"])}}<br />
+                                {% if module.specificity.subcluster %}
+                                Genes encoding specified AA: {{", ".join(module.specificity.subcluster)}}<br />
                                 {% endif %}
                                 {% endif %}
-                                {% if "c_dom_subtype" in module %}
-                                Condensation domain type: {{module["c_dom_subtype"]}} <br />
+                                {% if module.condensation_type %}
+                                Condensation domain type: {{module.condensation_type}} <br />
                                 {% endif %}
-                                {% if module.get("modification_domains") %}
-                                Modification domains: {{", ".join(module["modification_domains"])}}<br />
+                                {% if module.modification_domains %}
+                                Modification domains: {{", ".join(module.modification_domains)}}<br />
                                 {% endif %}
-                                {% if "non_canonical" in module %}
+                                {% if module.non_canonical %}
                                 Non-canonical activity: <br />
                                 <ul style="margin: 0;">
-                                    {% if module["non_canonical"].get("iterated") %}
+                                    {% if module.non_canonical.iterated %}
                                     <li>Iterated</li>
                                     {% endif %}
-                                    {% if module["non_canonical"].get("non_elongating") %}
+                                    {% if module.non_canonical.non_elongating %}
                                     <li>Non-elongating</li>
                                     {% endif %}
-                                    {% if module["non_canonical"].get("skipped") %}
+                                    {% if module.non_canonical.skipped %}
                                     <li>Skipped</li>
                                     {% endif %}
                                 </ul>
                                 Evidence for non-canonical activity: <br />
                                 <ul style="margin: 0;">
-                                    {% for evidence in module["non_canonical"].get("evidence", []) %}
+                                    {% for evidence in module.non_canonical.evidence %}
                                     <li>
                                         {{evidence}}
                                     </li>
