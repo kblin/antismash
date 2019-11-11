@@ -470,7 +470,7 @@ def write_outputs(results: serialiser.AntismashResults, options: ConfigType) -> 
 
     logging.debug("Creating results page")
     if options.mibig_mode:
-        mibig_acc = os.path.splitext(os.path.basename(options.mibig_json))[0]
+        mibig_acc = _get_mibig_acc(options)
         html_mibig.write(results.records, module_results_per_record, options)
         logging.debug("Saving mibig annotation file")
         annotation_filename = "{}.json".format(mibig_acc)
@@ -484,10 +484,6 @@ def write_outputs(results: serialiser.AntismashResults, options: ConfigType) -> 
     # convert records to biopython
     bio_records = []
     for record in results.records:
-        if options.mibig_mode:
-            record.id = "{}.1".format(mibig_acc)
-            record.name = mibig_acc
-            record.annotations['accessions'].insert(0, mibig_acc)
         bio_records.append(record.to_biopython())
 
 
@@ -517,6 +513,24 @@ def write_outputs(results: serialiser.AntismashResults, options: ConfigType) -> 
             shutil.make_archive(temp.name.replace(".zip", ""), "zip", root_dir=options.output_dir)
             shutil.copy(temp.name, zipfile)
         assert os.path.exists(zipfile)
+
+
+def _get_mibig_acc(options: ConfigType) -> str:
+    """ Get the MIBiG accession from the input file. Only works in MIBiG mode. """
+    return os.path.splitext(os.path.basename(options.mibig_json))[0]
+
+
+def mibig_rename_records(records: List[Record], options: ConfigType) -> None:
+    """ Rename records according to MIBiG identifiers. """
+    if not options.mibig_mode:
+        return
+
+    mibig_acc = _get_mibig_acc(options)
+
+    for record in records:
+        record.id = "{}.1".format(mibig_acc)
+        record.name = mibig_acc
+        record.annotations['accessions'].insert(0, mibig_acc)
 
 
 def annotate_records(results: serialiser.AntismashResults) -> None:
@@ -738,6 +752,9 @@ def _run_antismash(sequence_file: Optional[str], options: ConfigType) -> int:
 
     results.records = record_processing.pre_process_sequences(results.records, options,
                                                               cast(AntismashModule, genefinding))
+
+    if options.mibig_mode:
+        mibig_rename_records(results.records, options)
 
     for record, module_results in zip(results.records, results.results):
         # skip if we're not interested in it
