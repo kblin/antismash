@@ -13,11 +13,11 @@
     <div class="compound-structure">
       <div class="box">
         {% if compound.chem_struct %}
-        <canvas id="compound-drawing" width="100%" class="smiles-canvas" data-smiles="{{compound.chem_struct}}"></canvas>
+        <canvas id="compound-drawing-{{compound.compound|replace(' ', '-')}}" width="100%" class="smiles-canvas compound-drawing" data-smiles="{{compound.chem_struct}}"></canvas>
         <div class="focus-clipboard">
           <span class="clipboard-copy" data-seq="{{compound.chem_struct}}">Copy SMILES</span>
         </div>
-        <div id="compound-drawing-modal" class="modal-container">
+        <div id="compound-drawing-{{compound.compound|replace(' ', '-')}}-modal" class="modal-container compound-drawing-modal">
           <div class="modal-content">
             <canvas class="smiles-canvas-modal" data-smiles="{{compound.chem_struct}}"></canvas>
           </div>
