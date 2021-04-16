@@ -323,6 +323,10 @@
     @include hydrocarbon;
 }
 
+.isocyanide {
+    @include hydrocarbon;
+}
+
 .unknown {
     @include secmet(black, #f2f2f2, black);
 }
