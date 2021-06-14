@@ -322,9 +322,20 @@ class RuleParserTest(unittest.TestCase):
             rules = self.parse("RULE name CATEGORY nope CUTOFF 20 NEIGHBOURHOOD 20 CONDITIONS a").rules
 
     def test_section_comments(self):
-        rules = self.parse("RULE name CATEGORY category COMMENT this is a section comment CUTOFF 20"
+        rules = self.parse("RULE name CATEGORY category DESCRIPTION this is a section comment CUTOFF 20"
                            " NEIGHBOURHOOD 20 CONDITIONS a").rules
-        assert len(rules) == 1 and rules[0].comments == "this is a section comment"
+        assert len(rules) == 1 and rules[0].description == "this is a section comment"
+
+    def test_example(self):
+        rules = self.parse("RULE name CATEGORY category DESCRIPTION this is a comment EXAMPLE NCBI Y16952.3 1-66669"
+                           " CUTOFF 20 NEIGHBOURHOOD 20 CONDITIONS a").rules
+        assert len(rules) == 1 and \
+                rules[0].example.database == "NCBI" and \
+                rules[0].example.accession == "Y16952" and \
+                rules[0].example.version == 3 and \
+                rules[0].example.start == 1 and \
+                rules[0].example.end == 66669
+
 
     def test_single_superior(self):
         rules = self.parse("RULE first CATEGORY category CUTOFF 20 NEIGHBOURHOOD 20 CONDITIONS a "
