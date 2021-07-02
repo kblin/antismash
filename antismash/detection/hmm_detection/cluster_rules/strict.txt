@@ -91,9 +91,9 @@ RULE PUFA
     NEIGHBOURHOOD 20
     CONDITIONS PUFA_KS
 
-RULE NRPS
+RULE T1NRPS
     CATEGORY NRPS
-    DESCRIPTION non-ribosomal peptide synthase
+    DESCRIPTION Traditional (multi-)modular nonribosomal peptide synthase
     CUTOFF 20
     NEIGHBOURHOOD 20
     CONDITIONS cds(Condensation and (AMP-binding or A-OX))
