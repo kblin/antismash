@@ -323,6 +323,10 @@
     @include hydrocarbon;
 }
 
+.viperin {
+    @extend .other;
+}
+
 .unknown {
     @include secmet(black, #f2f2f2, black);
 }

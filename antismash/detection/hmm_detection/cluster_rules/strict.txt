@@ -501,3 +501,10 @@ RULE pyrrolidine
     CUTOFF 10
     NEIGHBOURHOOD 10
     CONDITIONS Glycos_transf_1 and Alpha-amylase and Aminotran_3 and DXP_synthase_N
+
+RULE viperin
+    CATEGORY other
+    COMMENT Viperins as described in https://doi.org/10.1038/s41586-020-2762-2
+    CUTOFF 10
+    NEIGHBOURHOOD 10
+    CONDITIONS pVip
