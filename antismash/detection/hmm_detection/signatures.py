@@ -3,13 +3,13 @@
 
 """ Functions and classes for managing the signatures from HMM profiles """
 
-from typing import List
+from typing import Sequence
 
 from antismash.common import path
 from antismash.common import signature
 
 
-def get_signature_profiles() -> List[signature.HmmSignature]:
+def get_signature_profiles() -> Sequence[signature.HmmSignature]:
     """ Generates the HMM signature profiles from hmmdetails.txt
         Only does the processing once per python invocation, future runs access
         existing profiles
@@ -21,7 +21,10 @@ def get_signature_profiles() -> List[signature.HmmSignature]:
         return existing
 
     # not cached yet, so generate
-    profiles = signature.get_signature_profiles(path.get_full_path(__file__, "data", "hmmdetails.txt"))
+    profiles = []
+    for sig in signature.get_signature_profiles(path.get_full_path(__file__, "data", "hmmdetails.txt")):
+        assert isinstance(sig, signature.HmmSignature)
+        profiles.append(sig)
 
     # cache this for future reuse, and silence mypy warnings because it can't handle it
     get_signature_profiles.existing = profiles  # type: ignore

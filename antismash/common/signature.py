@@ -3,7 +3,7 @@
 
 """ Signature related helpers """
 
-from typing import List
+from typing import Sequence
 
 from .path import get_full_path
 
@@ -27,7 +27,7 @@ class HmmSignature(Signature):
         super().__init__(name, 'model', description, cutoff, self.hmm_file)
 
 
-def get_signature_profiles(detail_file: str) -> List[HmmSignature]:
+def get_signature_profiles(detail_file: str) -> Sequence[Signature]:
     """ Generates HMM signature profiles from a file.
 
         Paths in the file are assumed to be relative to the file itself
