@@ -405,7 +405,7 @@ RULE fungal-RiPP
     NEIGHBOURHOOD 15
     CONDITIONS (pop or ustH) and (p450 or TP_methylase)
                or
-               #DUF3228 seems to be quite specific and also co-occurs with these peptidases
+               # DUF3328 seems to be quite specific and also co-occurs with these peptidases
                DUF3328 and (Peptidase_S41 or Peptidase_S28 or pop or ustH)
 
 RULE blactam
