@@ -408,6 +408,16 @@ RULE fungal-RiPP
                # DUF3328 seems to be quite specific and also co-occurs with these peptidases
                DUF3328 and (Peptidase_S41 or Peptidase_S28 or pop or ustH)
 
+RULE triceptide
+    CATEGORY RiPP
+    DESCRIPTION three-residue cyclophane RiPPs
+    # https://doi.org/10.1021/jacs.2c00521
+    EXAMPLE NCBI NZ_CP048261:6177254-6197207 yxd-derived compound
+    CUTOFF 10
+    NEIGHBOURHOOD 10
+    CONDITIONS TIGR04261 or TIGR04269 or TIGR04496
+
+
 RULE blactam
     CATEGORY other
     DESCRIPTION beta-lactam
