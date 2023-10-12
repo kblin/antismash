@@ -470,6 +470,24 @@ RULE fungal-RiPP
                #DUF3228 seems to be quite specific and also co-occurs with these peptidases
                DUF3328 and (Peptidase_S41 or Peptidase_S28 or pop or ustH)
 
+RULE azoxymycin
+    CATEGORY other
+    DESCRIPTION azoxy compound constructed by dimerisation
+    EXAMPLE NCBI NZ_LGKG01000136.1 21000-36000 azoxymycin
+    CUTOFF 20
+    NEIGHBOURHOOD 10
+    CONDITIONS AurF and Ketoacyl-synt_2 and AMP-binding  # C F J
+
+RULE azoxy-compound
+    CATEGORY other
+    DESCRIPTION non-dimer azoxy compounds constructed from N-N
+    EXAMPLE NCBI AY116644.1 1-21500 valanimycin
+    RELATED Flavin_Reduct   # R
+    CUTOFF 20
+    NEIGHBOURHOOD 10
+    CONDITIONS azdH_alignment and LPG_synthase_C and azdO and vlmB  # H A O B
+
+
 RULE blactam
     CATEGORY other
     DESCRIPTION beta-lactam
@@ -631,7 +649,7 @@ RULE other
     CUTOFF 20
     NEIGHBOURHOOD 20
     CONDITIONS LmbU or Neocarzinostat or bcpB
-               or frbD or mitE or vlmB or prnB or CaiA or bacilysin or orf2_PTase
+               or frbD or mitE or prnB or CaiA or bacilysin or orf2_PTase
 
 RULE acyl_amino_acids
     CATEGORY other

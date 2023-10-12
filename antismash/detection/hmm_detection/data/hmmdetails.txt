@@ -371,3 +371,10 @@ QueE	7-carboxy-7-deazaguanine synthase	22	QueE.hmm
 QueC	7-cyano-7-deazaguanine synthase	22	PF06508.hmm
 dpdA1	family of paralogs of tRNA guanosine transglycosylase genes	20	dpdA1.hmm
 bTGT	homodimeric bacterial tRNA-guanine transglycosylases	22	bTGT.hmm
+Flavin_Reduct	Flavin reductase like domain	27	PF01613.hmm
+LPG_synthase_C	Phosphatidylglycerol lysyltransferase, C-terminal	27	PF09924.hmm
+azdH_alignment	azdH	50	azdh.hmm
+azdO	azdO/vlmO	50	azdO.hmm
+Ketoacyl-synt_C	Ketoacyl-synt_C	20	PF02801.hmm
+Ketoacyl-synt_2	Ketoacyl-synt_2	25	PF13723.hmm
+Pyridoxal_deC	vlmD	25	PF00282.hmm
