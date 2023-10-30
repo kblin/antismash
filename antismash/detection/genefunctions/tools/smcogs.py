@@ -66,9 +66,9 @@ def classify(cds_features: Iterable[CDSFeature],
     cds_name_to_function = {}
     for cds_name, hit in hits.items():
         # pull out the identifier by itself
-        smcog_id, description = hit.hit_id.split(":", 1)
+        smcog_id, description = hit.reference_id.split(":", 1)
         # remove extraneous info
-        hit.hit_id = smcog_id
+        hit.reference_id = smcog_id
         hit.description = description.replace("_", " ")
         cds_name_to_function[cds_name] = ids_to_function[smcog_id]
 

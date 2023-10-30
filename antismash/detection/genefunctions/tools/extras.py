@@ -60,7 +60,7 @@ def classify(cds_features: Iterable[CDSFeature], _options: ConfigType) -> Result
     filtered = {}
     cds_name_to_function = {}
     for cds_name, hit in hits.items():
-        entry = metadata[hit.hit_id]
+        entry = metadata[hit.reference_id]
         if hit.bitscore < entry.cutoff:
             continue
         cds_name_to_function[cds_name] = entry.function

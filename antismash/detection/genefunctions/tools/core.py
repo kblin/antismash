@@ -4,7 +4,7 @@
 """ Core functions and classes for detection gene functions """
 
 from abc import ABC as AbstractBaseClass, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 import logging
 from typing import Any, Callable, Dict, Generic, Iterable, Mapping, Optional, Self, TypeVar
 
@@ -23,17 +23,25 @@ T = TypeVar("T", bound="Hit")
 @dataclass(kw_only=True, slots=True)
 class Hit(JSONBase):
     query_id: str
-    hit_id: str
+    reference_id: str
     subfunctions: list[str] = field(default_factory=list)
     description: str = ""
 
     def get_full_description(self) -> str:
         if self.description:
-            return f"{self.hit_id}: {self.description}"
-        return self.hit_id
+            return f"{self.reference_id}: {self.description}"
+        return self.reference_id
 
     def get_html_fragment(self, metadata: dict[str, Any] = None) -> Markup:  # pylint: disable=unused-argument
         return Markup(f"{self.query_id}: {self.get_full_description()}")
+
+#    def to_json(self) -> dict[str, Any]:
+#        return {
+#            "query_id": self.query_id,
+#            "reference_id": self.reference_id,
+#            "subfunctions": self.subfunctions,
+#            "description": self.description,
+#        }
 
     @classmethod
     def from_json(cls, data: dict[str, Any]) -> Self:
@@ -159,6 +167,7 @@ def scan_profiles_for_functions(cds_features: Iterable[CDSFeature], database: st
             a dictionary mapping CDS name to a list of HMM hits
     """
     search_fasta = fasta.get_fasta_from_features(cds_features)
+    assert isinstance(database, str)
     results = subprocessing.run_hmmscan(database, search_fasta, hmmscan_opts)
     hmm_lengths = utils.get_hmm_lengths(database)
     hmm_results = refine_hmmscan_results(results, hmm_lengths)
@@ -173,11 +182,10 @@ def scan_profiles_for_functions(cds_features: Iterable[CDSFeature], database: st
         best = hits[0]
         best_hits[cds_name] = HMMHit(
             query_id=cds_name,
-            hit_id=best.hit_id,
+            reference_id=best.hit_id,
             bitscore=best.bitscore,
             evalue=best.evalue,
             query_start=best.query_start,
             query_end=best.query_end,
         )
-
     return best_hits
