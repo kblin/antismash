@@ -1,0 +1,11 @@
+{
+    "entries": [
+        {
+            "identifier": "StrR_all_together_mafft",
+            "description": "StrR-like pathway specfic regulators",
+            "function": "regulatory",
+            "cutoff": 150,
+            "source": "doi.org/10.3390/antibiotics13020115"
+        }
+    ]
+}
