@@ -139,8 +139,8 @@ def add_arguments(args: ModuleArgs) -> None:
 
 def check_prereqs(options: ConfigType) -> list[str]:
     problems = prepare_data(logging_only=True)
+    available = False
     try:
-        available = False
         if get_dataset(options.genefunctions_mite_version):
             available = True
     except (FileNotFoundError, RuntimeError):
