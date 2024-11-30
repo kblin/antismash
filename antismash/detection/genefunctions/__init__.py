@@ -4,17 +4,27 @@
 """ A module to find and mark gene functions in records with a variety of tools
 """
 
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from itertools import chain
 import logging
 import os
 from typing import Any, Dict, Iterator, List, Optional, Self
 
+from markupsafe import Markup
+
 from antismash.common import hmmer, module_results, path
+from antismash.common.pfamdb import check_db
 from antismash.common.secmet import Record
+from antismash.common.secmet.qualifiers.gene_functions import ECGroup
 from antismash.config import ConfigType, get_config
 from antismash.config.args import ModuleArgs
 from antismash.detection import DetectionStage
+
+from antismash.common.html_renderer import HTMLSections, FileTemplate
+from antismash.common.layers import RegionLayer, RecordLayer, OptionsLayer
+from antismash.detection.genefunctions.tools.core import HMMHit
+from antismash.detection.genefunctions.tools.halogenases.data_structures import HalogenaseHit
 
 from .tools import (
     FunctionResults,
@@ -29,7 +39,7 @@ from .tools import (
 
 from .tools.extras import Results as ExtrasResults
 from .tools.halogenases import HalogenaseResults
-from .tools.mite import Results as MiteResults
+from .tools.mite import MiteHit, Results as MiteResults
 from .tools.smcogs import Results as SmcogsResults
 from .tools.resistance import Results as ResistanceResults
 
@@ -221,3 +231,91 @@ def run_on_record(record: Record, results: AllFunctionResults, options: ConfigTy
     for tool in TOOLS:
         results.add_tool_results(tool, tool.classify(cds_features, options))
     return results
+
+
+@dataclass(order=True)
+class TailoringEntry:
+    """ An entry in the Tailoring Enzymes table """
+    name: str
+    smcogs: HMMHit | None = field(default=None, kw_only=True)
+    mite: MiteHit | None = field(default=None, kw_only=True)
+    halogenase: HalogenaseHit | None = field(default=None, kw_only=True)
+    extra: HMMHit | None = field(default=None, kw_only=True)
+    url: str | None = field(default=None, kw_only=True)
+
+    def add_tool_results(self, results: FunctionResults[Any]) -> None:
+        """ Add the hit info for a tool """
+        if isinstance(results, SmcogsResults):
+            self.smcogs = results.best_hits.get(self.name)
+        elif isinstance(results, MiteResults):
+            self.mite = results.best_hits.get(self.name)
+            self.url = results.url
+        elif isinstance(results, HalogenaseResults):
+            self.halogenase = results.best_hits.get(self.name)
+        elif isinstance(results, ExtrasResults):
+            self.extra = results.best_hits.get(self.name)
+
+
+    @property
+    def description(self) -> str:
+        """ Get the most specific description of the entry """
+        if not any((self.smcogs, self.mite, self.halogenase, self.extra)):
+            raise ValueError("Need at least one tailoring descriptor set")
+
+        if self.halogenase:
+            return self.halogenase.description
+        if self.mite:
+            return self.mite.description
+        if self.extra:
+            return self.extra.description
+
+        assert self.smcogs  # shut up, mypy
+        return self.smcogs.description
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __iter__(self) -> Iterator[Markup]:
+        if self.halogenase:
+            yield Markup(f"<dt>Halogenase</dt><dd>{self.halogenase.get_html_fragment(hide_id=True)}</dd>")
+        if self.mite:
+            metadata = {"url": self.url}
+            yield Markup(f"<dt>MITE</dt><dd>{self.mite.get_html_fragment(metadata, hide_id=True)}</dd>")
+        if self.extra:
+            yield Markup(f"<dt>Extra</dt><dd>{self.extra.get_html_fragment(hide_id=True)}</dd>")
+        if self.smcogs:
+            yield Markup(f"<dt>smCoG</dt><dd>{self.smcogs.get_html_fragment(hide_id=True)}</dd>")
+
+
+def generate_html(region_layer: RegionLayer, results: AllFunctionResults,
+                  record_layer: RecordLayer, options_layer: OptionsLayer) -> HTMLSections:
+    """ Generate the details panel HTML with results from the tailoring module """
+
+    name_to_entry: dict[str, TailoringEntry] = {}
+    entries_by_group: dict[ECGroup, set[TailoringEntry]] = defaultdict(set)
+
+
+    for tool in results.tool_results:
+        for cds, mappings in tool.group_mapping.items():
+            if cds not in name_to_entry:
+                name_to_entry[cds] = TailoringEntry(cds)
+            entry = name_to_entry[cds]
+            entry.add_tool_results(tool)
+            for mapping in mappings:
+                entries_by_group[mapping].add(entry)
+
+    sorted_entries = {group: sorted(entries) for group, entries in entries_by_group.items()}
+
+    # description of EC numbers and
+    html = HTMLSections("tailoring")
+    template = FileTemplate(path.get_full_path(__file__, "templates", "tailoring.html"))
+    section = template.render(record = record_layer, region=region_layer,
+                              results = results,
+                              entries = sorted_entries,
+                              tooltip = "placeholder tooltip")
+    html.add_detail_section("Tailoring", section, "gene-function-details")
+    return html
+
+def will_handle(products: list[str], _product_categories: set[str]) -> bool:
+    """ Returns true if one or more relevant products or product categories are present """
+    return True

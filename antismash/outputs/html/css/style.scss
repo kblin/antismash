@@ -1645,6 +1645,51 @@ ul.dropdown-options {
     margin-right: 0.5em;
 }
 
+.tailoring-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.tailoring-ec-group {
+    width: 45%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5em;
+}
+
+.tailoring-ec-label {
+    padding: 0.25em;
+    font-weight: bold;
+}
+
+.tailoring-entries {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.tailoring-entry {
+    padding: 0.25em;
+}
+
+.tailoring-name {
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.tailoring-description {
+    color: #555;
+}
+
+.tailoring-details-container dt {
+    font-weight: bold;
+}
+
 .tfbs-details-container {
     .tfbs-weak-hits {
         padding-bottom: 1em;
