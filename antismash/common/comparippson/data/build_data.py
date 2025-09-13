@@ -281,8 +281,8 @@ def write_data(entries: List[Entry], metadata: Metadata, version: str,
         handle.write("}")
 
 
-def main(output_dir: str, version: str, *, file_list: List[str] = None, data_dir: str = "",
-         mibig: bool = False, asdb: bool = False, metadata: Metadata = None) -> None:
+def main(output_dir: str, version: str, *, file_list: list[str] | None = None, data_dir: str = "",
+         mibig: bool = False, asdb: bool = False, metadata: Metadata | None = None) -> None:
     """ The main entrypoint for building a database.
 
         One, but not both, of file_list and data_dir must be provided for the input files.
