@@ -20,6 +20,7 @@ from Bio.SeqRecord import SeqRecord
 from antismash.common import json
 from antismash.common.module_results import ModuleResults
 from antismash.common.secmet import Record
+from antismash.common.secmet.errors import SecmetInvalidInputError
 from antismash.common.secmet.locations import location_from_string
 
 # Schema version changes:
@@ -57,7 +58,7 @@ class AntismashResults:
         self.taxon = taxon
 
     @staticmethod
-    def from_file(handle: Union[str, IO]) -> "AntismashResults":
+    def from_file(handle: Union[str, IO], ignore_invalid_records: bool = False) -> "AntismashResults":
         """ Regenerates an instance of AntismashResults from JSON representation
             in a file
         """
@@ -84,7 +85,15 @@ class AntismashResults:
         version = data["version"]
         input_file = data["input_file"]
         taxon = data.get("taxon", "bacteria")
-        records = [record_from_json(rec, taxon) for rec in data["records"]]
+        records = []
+        for rec in data["records"]:
+            try:
+                records.append(record_from_json(rec, taxon))
+            except SecmetInvalidInputError as err:
+                if ignore_invalid_records:
+                    continue
+                raise err
+
         for record, rec_json in zip(records, data["records"]):
             if "original_id" in rec_json:
                 record.original_id = rec_json["original_id"]
