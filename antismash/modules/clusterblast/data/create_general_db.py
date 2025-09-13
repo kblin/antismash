@@ -183,7 +183,7 @@ def run(files: list[str], output_dir: str) -> None:
     regions: list[AsdbRegion] = []
 
     for filename in files:
-        for record in secmet.Record.from_file(filename):
+        for record in secmet.Record.from_file(filename, ignore_invalid_records=True):
             for secmet_region in record.get_regions():
                 if secmet_region.contig_edge:
                     continue
