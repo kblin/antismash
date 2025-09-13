@@ -136,7 +136,7 @@ def gather_entries(files: List[str]) -> List[Entry]:
                 # some RiPP modules keep motifs in different layouts
                 if name == "thiopeptides":
                     motifs = results["motifs"]
-                elif name in ["lanthipeptides", "lassopeptides", "sactipeptides", "thiopeptides"]:
+                elif name in ["lanthipeptides", "lassopeptides", "sactipeptides"]:
                     motifs = []
                     for _locus, motifs_for_locus in results["motifs"].items():
                         motifs.extend(motifs_for_locus)
