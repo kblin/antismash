@@ -893,13 +893,18 @@ class Record:
         return records
 
     @staticmethod
-    def from_file(filepath: str, taxon: str = "bacteria") -> List["Record"]:
+    def from_file(filepath: str, taxon: str = "bacteria", ignore_invalid_records: bool = False) -> List["Record"]:
         """ Reads any sequence file supported by helperlibs.bio and creates a
             Record instance for each record contained in the file.
         """
         records = []
         for bio in hl_seqio.parse(filepath):
-            records.append(Record.from_biopython(bio, taxon))
+            try:
+                records.append(Record.from_biopython(bio, taxon))
+            except SecmetInvalidInputError as err:
+                if ignore_invalid_records:
+                    continue
+                raise err
         return records
 
 
