@@ -5,8 +5,10 @@
 """ Builds databases of various types for the CompaRiPPson module """
 
 import argparse
+import bz2
 from dataclasses import dataclass
 import glob
+import gzip
 import os
 import sys
 from typing import Any, Dict, List
@@ -111,8 +113,15 @@ def gather_entries(files: List[str]) -> List[Entry]:
 
     def get_entries_from_file(json_path: str) -> None:
         """ Gather entries from a single file """
-        with open(json_path, encoding="utf-8") as handle:
-            data = json.load(handle)
+        if json_path.endswith(".bz2"):
+            with bz2.open(json_path, mode="rt", encoding="utf-8") as handle:
+                data = json.load(handle)
+        elif json_path.endswith(".gz"):
+            with gzip.open(json_path, mode="rt", encoding="utf-8") as handle:
+                data = json.load(handle)
+        else:
+            with open(json_path, encoding="utf-8") as handle:
+               data = json.load(handle)
         for record in data["records"]:
             accession = record["id"]
             # restore truncated names if possible
