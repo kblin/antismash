@@ -80,3 +80,13 @@ RULE terpene-precursor
     CUTOFF 10
     NEIGHBOURHOOD 10
     CONDITIONS PT_FPPS_like and not PT_HPP
+
+RULE 3-nitrotyrosine
+    CATEGORY RiPP
+    DESCRIPTION biarylitide-like 3-nitrotyrosine
+    # see https://doi.org/10.1016/j.chempr.2025.102438
+    EXAMPLE NCBI LC257593.1 24500-27313 3-nitrotyrosine precursor biosyntheis of rufomycin
+    CUTOFF 5
+    NEIGHBOURHOOD 10
+    CONDITIONS rufO and NO_synthase
+

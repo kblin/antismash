@@ -484,6 +484,15 @@ RULE archaeal-RiPP
     NEIGHBOURHOOD 10
     CONDITIONS rSAM_pep_methan and methano_modCys
 
+RULE biarylitde
+    CATEGORY RiPP
+    DESCRIPTION biarylitide
+    # see 10.1016/j.chembiol.2020.11.009
+    EXAMPLE NCBI MW201788.1 1-2160 biarylitide YYH
+    CUTOFF 5
+    NEIGHBOURHOOD 10
+    CONDITIONS bytO
+
 RULE epipeptide
     CATEGORY RiPP
     DESCRIPTION D-amino-acid containing RiPPs
