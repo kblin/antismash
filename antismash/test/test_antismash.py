@@ -199,3 +199,32 @@ class TestTimingsLog(unittest.TestCase):
         results = {"r1": {}}
         main.log_module_runtimes(results)
         mocked_logging.assert_not_called()
+
+
+class TestAutomaticReuseFromJson(unittest.TestCase):
+   def setUp(self):
+       self.all_modules = main.get_all_modules()
+       build_config(["--minimal"], isolated=True, modules=self.all_modules)
+
+   def tearDown(self):
+       destroy_config()
+
+   def test_json_input_becomes_reuse(self):
+       for filename in ["previous.json", "previous.json.gz", "previous.json.bz2"]:
+           with self.subTest(filename=filename):
+               destroy_config()
+               build_config(["--minimal"], isolated=True, modules=self.all_modules)
+
+               options = get_config()
+               sequence = main._normalise_reuse_from_input(filename, options)
+
+               assert sequence is None
+               assert get_config().reuse_results == filename
+
+   def test_sequence_input_stays_sequence(self):
+       options = get_config()
+
+       sequence = main._normalise_reuse_from_input("input.gbk", options)
+
+       assert sequence == "input.gbk"
+       assert get_config().reuse_results == ""

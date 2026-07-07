@@ -142,6 +142,25 @@ class TestCircularReuse(TestResultsReuse):
         assert protoclusters[0].crosses_origin()
 
 
+class TestPositionalReuse(TestResultsReuse):
+    def test_nisin_minimal(self):
+        # make sure the output directory isn't filled
+        out_dir = self.config.output_dir
+        assert not list(glob.glob(os.path.join(out_dir, "*")))
+
+        # make sure no files created
+        assert not list(glob.glob(os.path.join(out_dir, "*")))
+
+        # do a normal run
+        run_antismash(self.input_file, self.config)
+        self.check_output_files()
+
+        # remove html file and make sure it's recreated
+        os.unlink(os.path.join(self.config.output_dir, "index.html"))
+        run_antismash(os.path.join(self.config.output_dir, f"{self.file_prefix}.json"), self.config)
+        self.check_output_files()
+
+
 class TestModuleData(unittest.TestCase):
     def setUp(self):
         build_config([], isolated=True, modules=get_all_modules())

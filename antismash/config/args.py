@@ -494,7 +494,7 @@ def build_parser(from_config_file: bool = False, modules: List[AntismashModule] 
     parser.add_argument('sequences',
                         metavar='SEQUENCE',
                         nargs="*",
-                        help="GenBank/EMBL/FASTA file(s) containing DNA.")
+                        help="GenBank/EMBL/FASTA file containing DNA or antiSMASH result JSON file to reuse.")
     return parser
 
 def help_options() -> _SimpleArgs:

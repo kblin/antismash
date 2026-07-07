@@ -328,7 +328,8 @@ def prepare_output_directory(name: str, input_file: str) -> None:
         if not os.path.isdir(name):
             raise AntismashInputError("Output directory {name!r} exists and is not a directory")
         # not empty (apart from a possible input dir), and not reusing its results
-        if not input_file.endswith(".json") and \
+        reusing = bool(get_config().reuse_results)
+        if not reusing and \
                 list(filter(_ignore_patterns, glob.glob(os.path.join(name, "*")))):
             raise AntismashInputError("Output directory contains other files, aborting for safety")
 
@@ -732,6 +733,8 @@ def _run_antismash(sequence_file: Optional[str], options: ConfigType) -> int:
 
     start_time = datetime.now()
 
+    sequence_file = _normalise_reuse_from_input(sequence_file, options)
+
     results = read_data(sequence_file, options)
 
     # reset module timings
@@ -800,3 +803,36 @@ def _log_found_executables(options: ConfigType) -> None:
         if callable(version_getter):
             version = f" ({version_getter()})"
         logging.info("%s using executable: %s%s", binary, path, version)
+
+
+def _is_result_json(filename: str) -> bool:
+    lower = filename.lower()
+    return lower.endswith(".json") or lower.endswith(".json.gz") or lower.endswith(".json.bz2")
+
+
+def _normalise_reuse_from_input(sequence_file: Optional[str], options: ConfigType) -> Optional[str]:
+    """Treat a positional antiSMASH results JSON file as --reuse-results.
+
+    If a positional input looks like a results JSON file, and --reuse-results
+    was not explicitly given, move that filename into options.reuse_results and
+    return None so the caller does not try to parse it as a sequence file.
+
+    Arguments:
+        sequence_file: str if an input filename has been provided, or None
+        options: The configuration object to check
+
+    Returns:
+        The original sequence_file input, unless the sequence file looks like
+        a result JSON to reuse, then we return None
+    """
+    if not sequence_file:
+        return sequence_file
+
+    if options.reuse_results:
+        return sequence_file
+
+    if _is_result_json(sequence_file):
+        update_config({"reuse_results": sequence_file})
+        return None
+
+    return sequence_file
